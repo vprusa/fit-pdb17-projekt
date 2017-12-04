@@ -1,6 +1,7 @@
 package cz.vutbr.fit.pdb.project.tables;
 // Generated Nov 28, 2017 5:54:05 PM by Hibernate Tools 4.3.5.Final
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -69,13 +70,13 @@ public class Zona extends TableBase implements java.io.Serializable {
 			zona = entityManager.merge(zona);
 			entityManager.getTransaction().commit();
 		} catch (Exception e) {
-			e.printStackTrace();
 			entityManager.getTransaction().rollback();
+			e.printStackTrace();
 		}
 		return zona;
 	}
 
-	public static void listZona() {
+	public static List<Zona> listZona() {
 		try {
 			entityManager.getTransaction().begin();
 			@SuppressWarnings("unchecked")
@@ -85,23 +86,36 @@ public class Zona extends TableBase implements java.io.Serializable {
 				System.out.println(Zona.getNazevZony());
 			}
 			entityManager.getTransaction().commit();
+			return Zonas;
 		} catch (Exception e) {
 			entityManager.getTransaction().rollback();
+			e.printStackTrace();
 		}
+		return Collections.emptyList();
 	}
 
-	public static void updateZona(Long ZonaId, String ZonaName) {
+	public static Zona updateZona(Long ZonaId, String ZonaName) {
+		log.info("Zona.updateZona");
 		try {
 			entityManager.getTransaction().begin();
-			Zona Zona = (Zona) entityManager.find(Zona.class, ZonaId);
-			Zona.setNazevZony(ZonaName);
+			Zona zona = (Zona) entityManager.find(Zona.class, ZonaId);
+			if (zona == null) {
+				return null;
+			}
+			zona.setNazevZony(ZonaName);
 			entityManager.getTransaction().commit();
+			log.info("entityManager.getTransaction().commit();");
+			log.info(zona.getNazevZony());
+			// log.info(zona.getIdZony());
+			return zona;
 		} catch (Exception e) {
 			entityManager.getTransaction().rollback();
+			e.printStackTrace();
 		}
+		return null;
 	}
 
-	public static void deleteZona(Long ZonaId) {
+	public static boolean deleteZona(Long ZonaId) {
 		try {
 			entityManager.getTransaction().begin();
 			Zona Zona = (Zona) entityManager.find(Zona.class, ZonaId);
@@ -109,7 +123,10 @@ public class Zona extends TableBase implements java.io.Serializable {
 			entityManager.getTransaction().commit();
 		} catch (Exception e) {
 			entityManager.getTransaction().rollback();
+			e.printStackTrace();
+			return false;
 		}
+		return true;
 	}
 
 }
