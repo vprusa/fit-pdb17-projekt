@@ -36,7 +36,7 @@ public class App {
 
 		App example = new App();
 		System.out.println("After Sucessfully insertion ");
-		Zona student1 = Zona.saveZona("Sumith2");
+		Zona student1 = Zona.save("Sumith2");
 	/*	Zona student2 = example.saveZona("Anoop");
 		example.listZona();
 		System.out.println("After Sucessfully modification ");
@@ -46,7 +46,7 @@ public class App {
 		System.out.println("After Sucessfully deletion ");
 		example.deleteZona(student2.getid_zony());
 		*/
-		Zona.listZona();
+		Zona.list();
 
 	
 	}
