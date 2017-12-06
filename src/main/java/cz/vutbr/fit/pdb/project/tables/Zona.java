@@ -62,7 +62,7 @@ public class Zona extends TableBase implements java.io.Serializable {
 		this.nazevZony = nazevZony;
 	}
 
-	public static Zona saveZona(String ZonaName) {
+	public static Zona save(String ZonaName) {
 		Zona zona = new Zona();
 		try {
 			entityManager.getTransaction().begin();
@@ -76,7 +76,7 @@ public class Zona extends TableBase implements java.io.Serializable {
 		return zona;
 	}
 
-	public static List<Zona> listZona() {
+	public static List<Zona> list() {
 		try {
 			entityManager.getTransaction().begin();
 			@SuppressWarnings("unchecked")
@@ -94,8 +94,8 @@ public class Zona extends TableBase implements java.io.Serializable {
 		return Collections.emptyList();
 	}
 
-	public static Zona updateZona(Long ZonaId, String ZonaName) {
-		log.info("Zona.updateZona");
+	public static Zona update(Long ZonaId, String ZonaName) {
+		log.info("Zona.update");
 		try {
 			entityManager.getTransaction().begin();
 			Zona zona = (Zona) entityManager.find(Zona.class, ZonaId);
@@ -115,7 +115,7 @@ public class Zona extends TableBase implements java.io.Serializable {
 		return null;
 	}
 
-	public static boolean deleteZona(Long ZonaId) {
+	public static boolean delete(Long ZonaId) {
 		try {
 			entityManager.getTransaction().begin();
 			Zona Zona = (Zona) entityManager.find(Zona.class, ZonaId);
