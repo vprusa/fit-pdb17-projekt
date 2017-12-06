@@ -135,6 +135,21 @@
 		<!-- commented out to skip for the unset scm configuration -->
 		<!--finalName>${project.artifactId}-${project.version}-r${buildNumber}</finalName -->
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>${fully.qualified.main.class}</mainClass>
+				</configuration>
+			</plugin>
 			<!-- use SCM-based build numbers -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -150,6 +165,7 @@
 					</execution>
 				</executions>
 				<configuration>
+					<mainClass>${fully.qualified.main.class}</mainClass>
 					<shortRevisionLength>8</shortRevisionLength>
 					<!-- do not check locally modified files and fail if there are any; 
 						do not update the local repository -->

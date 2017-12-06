@@ -29,69 +29,6 @@ import oracle.jdbc.pool.OracleDataSource;
  */
 public class App {
 
-	private static final String PERSISTENCE_UNIT_NAME = "project01";
-	EntityManagerFactory emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
-
-	// private static EntityManagerFactory factory = HibernatePersistenceProvider
-	// .createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
-	// private static PersistenceProvider provider = new
-	// HibernatePersistenceProvider();
-	// EntityManagerFactory emf =
-	// provider.createEntityManagerFactory(PERSISTENCE_UNIT, props);
-
-	private EntityManager entityManager = emf.createEntityManager();
-
-	public Zona saveZona(String ZonaName) {
-		Zona zona = new Zona();
-		try {
-			entityManager.getTransaction().begin();
-			zona.setNazevZony(ZonaName);
-			zona  = entityManager.merge(zona);
-			entityManager.getTransaction().commit();
-		} catch (Exception e) {
-			e.printStackTrace();
-			entityManager.getTransaction().rollback();
-		}
-		return zona;
-	}
-
-	public void listZona() {
-		try {
-			entityManager.getTransaction().begin();
-			@SuppressWarnings("unchecked")
-			List<Zona> Zonas = entityManager.createQuery("from Zona").getResultList();
-			for (Iterator<Zona> iterator = Zonas.iterator(); iterator.hasNext();) {
-				Zona Zona = (Zona) iterator.next();
-				System.out.println(Zona.getNazevZony());
-			}
-			entityManager.getTransaction().commit();
-		} catch (Exception e) {
-			entityManager.getTransaction().rollback();
-		}
-	}
-
-	public void updateZona(Long ZonaId, String ZonaName) {
-		try {
-			entityManager.getTransaction().begin();
-			Zona Zona = (Zona) entityManager.find(Zona.class, ZonaId);
-			Zona.setNazevZony(ZonaName);
-			entityManager.getTransaction().commit();
-		} catch (Exception e) {
-			entityManager.getTransaction().rollback();
-		}
-	}
-
-	public void deleteZona(Long ZonaId) {
-		try {
-			entityManager.getTransaction().begin();
-			Zona Zona = (Zona) entityManager.find(Zona.class, ZonaId);
-			entityManager.remove(Zona);
-			entityManager.getTransaction().commit();
-		} catch (Exception e) {
-			entityManager.getTransaction().rollback();
-		}
-	}
-
 	public static void main(String[] args) throws Exception {
 		System.out.println("*** Oracle driver information ***");
 		OracleDriver.main(args);
@@ -99,7 +36,7 @@ public class App {
 
 		App example = new App();
 		System.out.println("After Sucessfully insertion ");
-		Zona student1 = example.saveZona("Sumith2");
+		Zona student1 = Zona.saveZona("Sumith2");
 	/*	Zona student2 = example.saveZona("Anoop");
 		example.listZona();
 		System.out.println("After Sucessfully modification ");
@@ -109,7 +46,7 @@ public class App {
 		System.out.println("After Sucessfully deletion ");
 		example.deleteZona(student2.getid_zony());
 		*/
-		example.listZona();
+		Zona.listZona();
 
 	
 	}

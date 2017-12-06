@@ -1,2 +1,6 @@
 target
 target/
+.classpath
+.project
+.settings/
+src/main/java/META-INF/hibernate.cfg.xml
