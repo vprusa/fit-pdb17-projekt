@@ -27,21 +27,14 @@ import cz.vutbr.fit.pdb.project.tables.entities.ImageOrdImageUserType;
  * http://rpouiller.developpez.com/tutoriels/java/manipulation-images-stockees-blob-ou-ordimage-avec-hibernate-grace-usertype/
  * 
  */
-// @Entity
-@Entity(name = "VOZIDLO")
-// @TypeDefs(value = { @TypeDef(name = "imageOrdImage", typeClass =
-// ImageOrdImageUserType.class) })
-// @Table(name = "VOZIDLO")
-// @TypeDefs(value = { @TypeDef(name = "imageOrdImage", typeClass =
-// ImageOrdImageUserType.class) })
+@Entity
+@Table(name = "VOZIDLO")
 @TypeDefs(value = {
 		@TypeDef(name = "imageOrdImage", typeClass = cz.vutbr.fit.pdb.project.tables.entities.ImageOrdImageUserType.class) })
 public class Vozidlo extends TableBase {
 
 	private String spz;
-	@Type(type = "imageOrdImage")
 	private Image foto;
-	@Type(type = "imageOrdImage")
 	private Image spzFoto;
 	private Set<Pobyt> pobyts = new HashSet<Pobyt>(0);
 
@@ -50,6 +43,13 @@ public class Vozidlo extends TableBase {
 
 	public Vozidlo(String spz) {
 		this.spz = spz;
+	}
+
+	public Vozidlo(String spz, Image foto, Image spzFoto) {
+		this.spz = spz;
+		this.foto = foto;
+		this.spzFoto = spzFoto;
+		this.pobyts = Collections.emptySet();
 	}
 
 	public Vozidlo(String spz, Image foto, Image spzFoto, Set<Pobyt> pobyts) {
@@ -99,29 +99,30 @@ public class Vozidlo extends TableBase {
 	}
 
 	public static Vozidlo save(String spz, Image foto, Image spzFoto, Set<Pobyt> pobyts) {
-		Vozidlo Vozidlo = new Vozidlo(spz, foto, spzFoto, pobyts);
+		Vozidlo vozidlo = new Vozidlo(spz, foto, spzFoto, pobyts);
 		try {
 			entityManager.getTransaction().begin();
-			Vozidlo = entityManager.merge(Vozidlo);
+			vozidlo = entityManager.merge(vozidlo);
 			entityManager.getTransaction().commit();
 		} catch (Exception e) {
 			entityManager.getTransaction().rollback();
 			e.printStackTrace();
 		}
-		return Vozidlo;
+		return vozidlo;
 	}
 
 	public static List<Vozidlo> list() {
+		log.info("Vozidlo.list");
 		try {
 			entityManager.getTransaction().begin();
-			@SuppressWarnings("unchecked")
-			List<Vozidlo> Vozidlos = entityManager.createQuery("from Vozidlo").getResultList();
-			for (Iterator<Vozidlo> iterator = Vozidlos.iterator(); iterator.hasNext();) {
-				Vozidlo Vozidlo = (Vozidlo) iterator.next();
-				log.info("Vozidlo: SPZ: " + Vozidlo.spz + " , Img: " + Vozidlo.foto.toString());
+			// @SuppressWarnings("unchecked")
+			List<Vozidlo> vozidlos = (List<Vozidlo>) entityManager.createQuery("from Vozidlo").getResultList();
+			for (Iterator<Vozidlo> iterator = vozidlos.iterator(); iterator.hasNext();) {
+				Vozidlo vozidlo = (Vozidlo) iterator.next();
+				log.info("Vozidlo: SPZ: " + vozidlo.spz + " , Img: " + vozidlo.foto.toString());
 			}
 			entityManager.getTransaction().commit();
-			return Vozidlos;
+			return vozidlos;
 		} catch (Exception e) {
 			entityManager.getTransaction().rollback();
 			e.printStackTrace();
@@ -133,15 +134,20 @@ public class Vozidlo extends TableBase {
 		log.info("Vozidlo.update");
 		try {
 			entityManager.getTransaction().begin();
-			Vozidlo Vozidlo = (Vozidlo) entityManager.find(Vozidlo.class, spz);
-			if (Vozidlo == null) {
+			Vozidlo vozidlo = (Vozidlo) entityManager.find(Vozidlo.class, spz);
+			if (vozidlo == null) {
 				return null;
 			}
-			Vozidlo.setSpz(spz);
-			Vozidlo.setPobyts(pobyts);
-			Vozidlo.setSpzFoto(spzFoto);
+			// if (newSpz != null)
+			// vozidlo.setSpz(newSpz);
+			if (pobyts != null)
+				vozidlo.setPobyts(pobyts);
+			if (foto != null)
+				vozidlo.setFoto(foto);
+			if (spzFoto != null)
+				vozidlo.setSpzFoto(spzFoto);
 			entityManager.getTransaction().commit();
-			return Vozidlo;
+			return vozidlo;
 		} catch (Exception e) {
 			entityManager.getTransaction().rollback();
 			e.printStackTrace();
