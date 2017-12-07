@@ -33,8 +33,10 @@ public class App {
 		System.out.println("*** Oracle driver information ***");
 		OracleDriver.main(args);
 		System.out.println("*** Connecting to the Oracle db. and running a simple query ***");
-
-		App example = new App();
+		
+		LoginForm myLoginForm = new LoginForm ();
+		myLoginForm.setVisible(true);
+		//App example = new App();
 		System.out.println("After Sucessfully insertion ");
 		Zona student1 = Zona.save("Sumith2");
 	/*	Zona student2 = example.saveZona("Anoop");
