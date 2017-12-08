@@ -11,12 +11,14 @@ import java.util.Collections;
 import javax.imageio.ImageIO;
 
 import org.jboss.logging.Logger;
+import org.junit.Before;
 
 import cz.vutbr.fit.pdb.project.model.TableBase;
 import cz.vutbr.fit.pdb.project.tables.Vozidlo;
 import cz.vutbr.fit.pdb.project.tables.Zona;
 import junit.framework.Test;
 import junit.framework.TestCase;
+
 import junit.framework.TestSuite;
 import oracle.jdbc.OracleResultSet;
 import oracle.ord.im.OrdImage;
@@ -43,6 +45,12 @@ public class TableTests extends TestCase {
 	 */
 	public static Test suite() {
 		return new TestSuite(TableTests.class);
+	}
+
+	// http://junit.sourceforge.net/junit3.8.1/javadoc/junit/framework/TestCase.html
+	public void setUp() {
+		log.info("Run this method before each test");
+		TableBase.login(null, null, null);
 	}
 
 	/**
