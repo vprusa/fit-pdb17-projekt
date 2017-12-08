@@ -30,15 +30,15 @@ import oracle.jdbc.pool.OracleDataSource;
 public class App {
 
 	public static void main(String[] args) throws Exception {
-		System.out.println("*** Oracle driver information ***");
-		OracleDriver.main(args);
-		System.out.println("*** Connecting to the Oracle db. and running a simple query ***");
+		//System.out.println("*** Oracle driver information ***");
+		//OracleDriver.main(args);
+		//System.out.println("*** Connecting to the Oracle db. and running a simple query ***");
 		
 		LoginForm myLoginForm = new LoginForm ();
 		myLoginForm.setVisible(true);
 		//App example = new App();
-		System.out.println("After Sucessfully insertion ");
-		Zona student1 = Zona.save("Sumith2");
+		//System.out.println("After Sucessfully insertion ");
+		//Zona student1 = Zona.save("Sumith2");
 	/*	Zona student2 = example.saveZona("Anoop");
 		example.listZona();
 		System.out.println("After Sucessfully modification ");
@@ -48,7 +48,7 @@ public class App {
 		System.out.println("After Sucessfully deletion ");
 		example.deleteZona(student2.getid_zony());
 		*/
-		Zona.list();
+		//Zona.list();
 
 	
 	}
