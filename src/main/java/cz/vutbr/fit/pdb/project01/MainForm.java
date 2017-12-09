@@ -28,6 +28,10 @@ import java.awt.Canvas;
 import java.awt.Panel;
 import java.awt.Choice;
 import java.awt.Color;
+import javax.swing.JTable;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.Box;
 
 public class MainForm extends JFrame {
 
@@ -39,6 +43,17 @@ public class MainForm extends JFrame {
 	private JTextField ElementName;
 	private JTextField parrentZone;
 	private JTextField id;
+	private JTextField lastMonthFrequency;
+	private JTextField averageStay;
+	private JTextField FrequencyFrom;
+	private JTextField FrequencyTo;
+	private JTextField AverageStayFrom;
+	private JTextField AverageStayTo;
+	private JTable EntranceExitToday;
+	private JTable CrurrentlyParking;
+	private JTextField deleteFrom;
+	private JTextField deleteTo;
+	private JTable currentResidence;
 
 	/**
 	 * Launch the application.
@@ -92,6 +107,9 @@ public class MainForm extends JFrame {
 		canvas.setSize(400, 400);
 		canvasPanel.add(canvas);
 		
+		Component horizontalStrut_4 = Box.createHorizontalStrut(20);
+		prostorovaData.add(horizontalStrut_4);
+		
 		JPanel canvasBttonsPanel = new JPanel();
 		prostorovaData.add(canvasBttonsPanel);
 		canvasBttonsPanel.setLayout(new BoxLayout(canvasBttonsPanel, BoxLayout.Y_AXIS));
@@ -109,27 +127,31 @@ public class MainForm extends JFrame {
 		JButton btnAddElement = new JButton("Přidat");
 		addPanel.add(btnAddElement);
 		
+		Component verticalStrut = Box.createVerticalStrut(20);
+		canvasBttonsPanel.add(verticalStrut);
+		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		canvasBttonsPanel.add(tabbedPane);
 		
 		JPanel elementSelectonPanel = new JPanel();
+		elementSelectonPanel.setMinimumSize(new Dimension(0,0));
 		tabbedPane.addTab("Vlastnosti", null, elementSelectonPanel, null);
 		
 		JPanel idPanel = new JPanel();
 		elementSelectonPanel.add(idPanel);
 		
-		JLabel lblNewLabel_4 = new JLabel("ID položky");
+		JLabel lblNewLabel_4 = new JLabel("ID položky:");
 		idPanel.add(lblNewLabel_4);
 		
 		id = new JTextField();
-		id.setEnabled(false);
+		id.setEditable(false);
 		idPanel.add(id);
 		id.setColumns(10);
 		
 		JPanel parrentZonePanel = new JPanel();
 		elementSelectonPanel.add(parrentZonePanel);
 		
-		JLabel lblNewLabel_3 = new JLabel("Mateřská zóna");
+		JLabel lblNewLabel_3 = new JLabel("Mateřská zóna:");
 		parrentZonePanel.add(lblNewLabel_3);
 		
 		parrentZone = new JTextField();
@@ -151,13 +173,63 @@ public class MainForm extends JFrame {
 		JPanel elementNamePanel = new JPanel();
 		elementSelectonPanel.add(elementNamePanel);
 		
-		JLabel lblNewLabel_2 = new JLabel("Název položky");
+		JLabel lblNewLabel_2 = new JLabel("Název položky:");
 		elementNamePanel.add(lblNewLabel_2);
 		
 		ElementName = new JTextField();
 		ElementName.setEditable(false);
 		elementNamePanel.add(ElementName);
 		ElementName.setColumns(10);
+		
+		JPanel lastMonthFrequencyPanel = new JPanel();
+		elementSelectonPanel.add(lastMonthFrequencyPanel);
+		
+		JLabel lblNewLabel_5 = new JLabel("Frekventovanost od");
+		lastMonthFrequencyPanel.add(lblNewLabel_5);
+		
+		FrequencyFrom = new JTextField();
+		lastMonthFrequencyPanel.add(FrequencyFrom);
+		FrequencyFrom.setColumns(10);
+		
+		JLabel lblNewLabel_7 = new JLabel("do");
+		lastMonthFrequencyPanel.add(lblNewLabel_7);
+		
+		FrequencyTo = new JTextField();
+		lastMonthFrequencyPanel.add(FrequencyTo);
+		FrequencyTo.setColumns(10);
+		
+		JLabel lblJe = new JLabel("je:");
+		lastMonthFrequencyPanel.add(lblJe);
+		
+		lastMonthFrequency = new JTextField();
+		lastMonthFrequency.setEditable(false);
+		lastMonthFrequencyPanel.add(lastMonthFrequency);
+		lastMonthFrequency.setColumns(10);
+		
+		JPanel averageStayPanel = new JPanel();
+		elementSelectonPanel.add(averageStayPanel);
+		
+		JLabel lblNewLabel_6 = new JLabel("Průměrná délka stání od");
+		averageStayPanel.add(lblNewLabel_6);
+		
+		AverageStayFrom = new JTextField();
+		averageStayPanel.add(AverageStayFrom);
+		AverageStayFrom.setColumns(10);
+		
+		JLabel lblNewLabel_8 = new JLabel("do");
+		averageStayPanel.add(lblNewLabel_8);
+		
+		AverageStayTo = new JTextField();
+		averageStayPanel.add(AverageStayTo);
+		AverageStayTo.setColumns(10);
+		
+		JLabel lblNewLabel_9 = new JLabel("je:");
+		averageStayPanel.add(lblNewLabel_9);
+		
+		averageStay = new JTextField();
+		averageStay.setEditable(false);
+		averageStayPanel.add(averageStay);
+		averageStay.setColumns(10);
 		
 		JButton btnDeleteElement = new JButton("Smazat položku");
 		elementSelectonPanel.add(btnDeleteElement);
@@ -220,6 +292,9 @@ public class MainForm extends JFrame {
 
 		JButton btnSearchButton = new JButton("Search");
 		searchPanel.add(btnSearchButton);
+		
+		Component horizontalStrut_3 = Box.createHorizontalStrut(20);
+		multimedialniData.add(horizontalStrut_3);
 
 		JPanel picturePanel = new JPanel();
 		multimedialniData.add(picturePanel);
@@ -236,14 +311,118 @@ public class MainForm extends JFrame {
 		pictureDetail.setMaximumSize(new Dimension(10000,100));
 		picturePanel.add(pictureDetail);
 
-		JButton btRotateLeft = new JButton("RotateLeft");
+		JButton btRotateLeft = new JButton("Rotovat vlevo");
 		pictureDetail.add(btRotateLeft);
 
-		JButton btnRotateRight = new JButton("Rotate Right");
+		JButton btnRotateRight = new JButton("Rotovat vpravo");
 		pictureDetail.add(btnRotateRight);
+		
+		JButton btnSave = new JButton("Uložit");
+		pictureDetail.add(btnSave);
 
 		JPanel temporalniData = new JPanel();
 		mainPanel.addTab("Temporální data", null, temporalniData, null);
+		temporalniData.setLayout(new BoxLayout(temporalniData, BoxLayout.X_AXIS));
+		
+		JPanel entranceExitTodayPanel = new JPanel();
+		temporalniData.add(entranceExitTodayPanel);
+		entranceExitTodayPanel.setLayout(new BorderLayout(0, 0));
+		
+		JLabel lblNewLabel_10 = new JLabel("Dnešní vjezdy a výjezdy ");
+		lblNewLabel_10.setHorizontalAlignment(SwingConstants.CENTER);
+		entranceExitTodayPanel.add(lblNewLabel_10, BorderLayout.NORTH);
+		
+		EntranceExitToday = new JTable();
+		entranceExitTodayPanel.add(EntranceExitToday, BorderLayout.CENTER);
+		
+		Component horizontalStrut = Box.createHorizontalStrut(20);
+		temporalniData.add(horizontalStrut);
+		
+		JPanel currentParkingPanel = new JPanel();
+		temporalniData.add(currentParkingPanel);
+		currentParkingPanel.setLayout(new BorderLayout(0, 0));
+		
+		JLabel lblNewLabel_11 = new JLabel("Právě parkují");
+		lblNewLabel_11.setHorizontalAlignment(SwingConstants.CENTER);
+		currentParkingPanel.add(lblNewLabel_11, BorderLayout.NORTH);
+		
+		CrurrentlyParking = new JTable();
+		currentParkingPanel.add(CrurrentlyParking, BorderLayout.CENTER);
+		
+		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
+		temporalniData.add(horizontalStrut_1);
+		
+		JPanel currentResidencePanel = new JPanel();
+		temporalniData.add(currentResidencePanel);
+		currentResidencePanel.setLayout(new BorderLayout(0, 0));
+		
+		JLabel lblNewLabel_15 = new JLabel("Probíhající pobyty");
+		lblNewLabel_15.setHorizontalAlignment(SwingConstants.CENTER);
+		currentResidencePanel.add(lblNewLabel_15, BorderLayout.NORTH);
+		
+		currentResidence = new JTable();
+		currentResidencePanel.add(currentResidence, BorderLayout.CENTER);
+		
+		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
+		temporalniData.add(horizontalStrut_2);
+		
+		JPanel deletion = new JPanel();
+		temporalniData.add(deletion);
+		deletion.setLayout(new BorderLayout(0, 0));
+		
+		JLabel lblNewLabel_12 = new JLabel("Mazání dat");
+		lblNewLabel_12.setHorizontalAlignment(SwingConstants.CENTER);
+		deletion.add(lblNewLabel_12, BorderLayout.NORTH);
+		
+		JPanel DeleteButtonsPanel = new JPanel();
+		deletion.add(DeleteButtonsPanel, BorderLayout.CENTER);
+		
+		JPanel FromPanel = new JPanel();
+		DeleteButtonsPanel.add(FromPanel);
+		
+		JLabel lblNewLabel_13 = new JLabel("Smazat data od:");
+		FromPanel.add(lblNewLabel_13);
+		
+		deleteFrom = new JTextField();
+		deleteFrom.setText("DD.MM.YYYY");
+		FromPanel.add(deleteFrom);
+		deleteFrom.setColumns(10);
+		deleteFrom.addActionListener(new java.awt.event.ActionListener() 
+		{
+		    public void actionPerformed(java.awt.event.ActionEvent e) 
+		    {
+		    	if (deleteFrom.getText().length()==0)
+		    	{
+		            deleteFrom.setText("DD.MM.YYYY");
+		        }       
+		    }
+		});
+		
+		
+		
+		JPanel ToPanel = new JPanel();
+		DeleteButtonsPanel.add(ToPanel);
+		
+		JLabel lblNewLabel_14 = new JLabel("Smazat data do:");
+		ToPanel.add(lblNewLabel_14);
+		
+		deleteTo = new JTextField();
+		deleteTo.setText("DD.MM.YYYY");
+		ToPanel.add(deleteTo);
+		deleteTo.setColumns(10);
+		deleteTo.addActionListener(new java.awt.event.ActionListener() 
+		{
+		    public void actionPerformed(java.awt.event.ActionEvent e) 
+		    {
+		    	if (deleteTo.getText().length()==0)
+		    	{
+		    		deleteTo.setText("DD.MM.YYYY");
+		        }       
+		    }
+		});
+		
+		JButton btnDeleteButton = new JButton("Smazat");
+		DeleteButtonsPanel.add(btnDeleteButton);
 	}
 
 }
