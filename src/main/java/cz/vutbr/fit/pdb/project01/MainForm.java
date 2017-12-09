@@ -24,12 +24,21 @@ import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import java.awt.Component;
+import java.awt.Canvas;
+import java.awt.Panel;
+import java.awt.Choice;
+import java.awt.Color;
 
 public class MainForm extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField statusText;
 	private JTextField searchText;
+	private JTextField textField;
+	private JTextField elementType;
+	private JTextField ElementName;
+	private JTextField parrentZone;
+	private JTextField id;
 
 	/**
 	 * Launch the application.
@@ -52,7 +61,7 @@ public class MainForm extends JFrame {
 	 */
 	public MainForm(String url, String login) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 700, 500);
+		setBounds(100, 100, 1000, 800);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -73,6 +82,102 @@ public class MainForm extends JFrame {
 
 		JPanel prostorovaData = new JPanel();
 		mainPanel.addTab("Prostorová data", null, prostorovaData, null);
+		prostorovaData.setLayout(new BoxLayout(prostorovaData, BoxLayout.X_AXIS));
+		
+		JPanel canvasPanel = new JPanel();
+		canvasPanel.setBackground(Color.WHITE);
+		prostorovaData.add(canvasPanel);
+		
+		Canvas canvas = new Canvas();
+		canvas.setSize(400, 400);
+		canvasPanel.add(canvas);
+		
+		JPanel canvasBttonsPanel = new JPanel();
+		prostorovaData.add(canvasBttonsPanel);
+		canvasBttonsPanel.setLayout(new BoxLayout(canvasBttonsPanel, BoxLayout.Y_AXIS));
+		
+		Panel addPanel = new Panel();
+		canvasBttonsPanel.add(addPanel);
+		
+		Choice elementChoice = new Choice();
+		elementChoice.add("Auto");
+		elementChoice.add("Parkovací místo");
+		elementChoice.add("Vjezd");
+		elementChoice.add("Výjezd");
+		addPanel.add(elementChoice);
+		
+		JButton btnAddElement = new JButton("Přidat");
+		addPanel.add(btnAddElement);
+		
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		canvasBttonsPanel.add(tabbedPane);
+		
+		JPanel elementSelectonPanel = new JPanel();
+		tabbedPane.addTab("Vlastnosti", null, elementSelectonPanel, null);
+		
+		JPanel idPanel = new JPanel();
+		elementSelectonPanel.add(idPanel);
+		
+		JLabel lblNewLabel_4 = new JLabel("ID položky");
+		idPanel.add(lblNewLabel_4);
+		
+		id = new JTextField();
+		id.setEnabled(false);
+		idPanel.add(id);
+		id.setColumns(10);
+		
+		JPanel parrentZonePanel = new JPanel();
+		elementSelectonPanel.add(parrentZonePanel);
+		
+		JLabel lblNewLabel_3 = new JLabel("Mateřská zóna");
+		parrentZonePanel.add(lblNewLabel_3);
+		
+		parrentZone = new JTextField();
+		parrentZone.setEditable(false);
+		parrentZonePanel.add(parrentZone);
+		parrentZone.setColumns(10);
+		
+		JPanel elementTypePanel = new JPanel();
+		elementSelectonPanel.add(elementTypePanel);
+		
+		JLabel lblNewLabel_1 = new JLabel("Typ položky:");
+		elementTypePanel.add(lblNewLabel_1);
+		
+		elementType = new JTextField();
+		elementType.setEditable(false);
+		elementTypePanel.add(elementType);
+		elementType.setColumns(10);
+		
+		JPanel elementNamePanel = new JPanel();
+		elementSelectonPanel.add(elementNamePanel);
+		
+		JLabel lblNewLabel_2 = new JLabel("Název položky");
+		elementNamePanel.add(lblNewLabel_2);
+		
+		ElementName = new JTextField();
+		ElementName.setEditable(false);
+		elementNamePanel.add(ElementName);
+		ElementName.setColumns(10);
+		
+		JButton btnDeleteElement = new JButton("Smazat položku");
+		elementSelectonPanel.add(btnDeleteElement);
+		
+		JPanel distanceMeasuringPanel = new JPanel();
+		tabbedPane.addTab("Měření vzdálenosti", null, distanceMeasuringPanel, null);
+		
+		JButton btnStartDistanceMeasure = new JButton("Zahájit měření");
+		distanceMeasuringPanel.add(btnStartDistanceMeasure);
+		
+		JPanel distanceResultPanel = new JPanel();
+		distanceMeasuringPanel.add(distanceResultPanel);
+		
+		JLabel lblNewLabel = new JLabel("Naměřená vzdálenost:");
+		distanceResultPanel.add(lblNewLabel);
+		
+		textField = new JTextField();
+		textField.setEditable(false);
+		distanceResultPanel.add(textField);
+		textField.setColumns(10);
 
 		JPanel multimedialniData = new JPanel();
 		mainPanel.addTab("Multimediální data", null, multimedialniData, null);
@@ -121,12 +226,14 @@ public class MainForm extends JFrame {
 		picturePanel.setLayout(new BoxLayout(picturePanel, BoxLayout.Y_AXIS));
 
 		JPanel pictureItself = new JPanel();
+		pictureItself.setBackground(Color.WHITE);
 		picturePanel.add(pictureItself);
 
 		JLabel PictureLabel = new JLabel();
 		pictureItself.add(PictureLabel);
 
 		JPanel pictureDetail = new JPanel();
+		pictureDetail.setMaximumSize(new Dimension(10000,100));
 		picturePanel.add(pictureDetail);
 
 		JButton btRotateLeft = new JButton("RotateLeft");
