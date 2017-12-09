@@ -26,6 +26,7 @@ import java.awt.event.ActionListener;
 import java.util.Properties;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
+import java.awt.Component;
 
 public class LoginForm extends JFrame {
 
@@ -63,11 +64,11 @@ public class LoginForm extends JFrame {
 		setResizable(false);
 		setTitle("Login Form");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(300, 300, 235, 200);
+		setBounds(300, 300, 400, 180);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		contentPane.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
 		userPanel = new JPanel();
 		contentPane.add(userPanel);
@@ -77,7 +78,7 @@ public class LoginForm extends JFrame {
 
 		user = new JTextField();
 		userPanel.add(user);
-		user.setColumns(10);
+		user.setColumns(20);
 
 		passwordPanel = new JPanel();
 		contentPane.add(passwordPanel);
@@ -87,17 +88,36 @@ public class LoginForm extends JFrame {
 
 		password = new JTextField();
 		passwordPanel.add(password);
-		password.setColumns(10);
+		password.setColumns(20);
 
 		urlPanel = new JPanel();
 		contentPane.add(urlPanel);
 
-		urlLabel = new JLabel("       URL:");
+		urlLabel = new JLabel("URL:");
 		urlPanel.add(urlLabel);
 
 		url = new JTextField();
+
+		url.setText("jdbc:oracle:thin:@//gort.fit.vutbr.cz:1521/gort");
 		urlPanel.add(url);
-		url.setColumns(10);
+		url.setColumns(30);
+
+		JButton btnNewButton = new JButton("Log In");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (TableBase.login(url.getText(), user.getText(), password.getText())) {
+					MainForm myMainForm = new MainForm(url.getText(), user.getText());
+					myMainForm.setVisible(true);
+					dispose();
+					// test - shoudl not fail
+					Zona.list();
+				} else {
+					user.setText("");
+					password.setText("");
+				}
+			}
+		});
+		contentPane.add(btnNewButton);
 
 		String Dusername = System.getProperty("username");
 		String Dpassword = System.getProperty("password");
@@ -111,23 +131,6 @@ public class LoginForm extends JFrame {
 		if (Dusername != null) {
 			user.setText(Dusername);
 		}
-		
-		JButton btnNewButton = new JButton("Log In");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (TableBase.login(url.getText(), user.getText(), password.getText())) {
-					MainForm myMainForm = new MainForm();
-					myMainForm.setVisible(true);
-					dispose();
-					// test - shoudl not fail
-					Zona.list();
-				} else {
-					user.setText("");
-					password.setText("");
-				}
-			}
-		});
-		contentPane.add(btnNewButton);
 	}
 
 }
