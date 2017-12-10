@@ -6,8 +6,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 import org.jboss.logging.Logger;
 
+@TypeDefs(value = {
+		@TypeDef(name = "JGeometryType", typeClass = cz.vutbr.fit.pdb.project.tables.entities.JGeometryType.class) })
 public class TableBase {
 
 	// https://stackoverflow.com/questions/19773258/how-to-modify-properties-after-create-entity-manager-factory-from-persistence-xm

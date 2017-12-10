@@ -29,8 +29,6 @@ import cz.vutbr.fit.pdb.project.tables.entities.ImageOrdImageUserType;
  */
 @Entity
 @Table(name = "VOZIDLO")
-@TypeDefs(value = {
-		@TypeDef(name = "imageOrdImage", typeClass = cz.vutbr.fit.pdb.project.tables.entities.ImageOrdImageUserType.class) })
 public class Vozidlo extends TableBase {
 
 	private String spz;
@@ -98,7 +96,7 @@ public class Vozidlo extends TableBase {
 		this.pobyts = pobyts;
 	}
 
-	public static Vozidlo save(String spz, Image foto, Image spzFoto, Set<Pobyt> pobyts) {
+	public static Vozidlo insert(String spz, Image foto, Image spzFoto, Set<Pobyt> pobyts) {
 		Vozidlo vozidlo = new Vozidlo(spz, foto, spzFoto, pobyts);
 		try {
 			entityManager.getTransaction().begin();
