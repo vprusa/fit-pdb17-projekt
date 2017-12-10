@@ -7,6 +7,7 @@ import javax.swing.text.TableView;
 
 import cz.vutbr.fit.pdb.project.model.TableBase;
 import cz.vutbr.fit.pdb.project.tables.ParkovaciMisto;
+import oracle.spatial.geometry.JGeometry;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -20,6 +21,7 @@ import java.util.List;
 public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener, MouseMotionListener {
 
 	private Map<Integer, Shape> shapesMap = new HashMap<>();
+	private Map<Integer, JGeometry> geometryMap = new HashMap<>();
 	
 	private int pressedX;
 	private int pressedY;
@@ -45,7 +47,11 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		shapesMap.put(key++, shape);
 		
 		System.out.print("SpatialDataCanvasPanelForm\n");
-		loadObjects();
+		try {
+			loadObjects();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		repaint();
 	}
@@ -146,14 +152,20 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		return;
 	}
 	
-	private void loadObjects() {
-		Query q = TableBase.getEntityManager().createQuery("SELECT p FROM ParkovaciMisto p", ParkovaciMisto.class);
-		
-		List<ParkovaciMisto> resultList = q.getResultList();
-		Map<String, Long> resultMap = new HashMap<String, Long>(resultList.size());
-		for (ParkovaciMisto result : resultList) {
-			System.out.print("result: " + result.getIdMista().toString() + "\n");
-			//resultMap.put((String)result[0], (Long)result[1]);
+	private void loadObjects() throws Exception {
+		try {
+			Query q = TableBase.getEntityManager().createQuery("SELECT p FROM ParkovaciMisto p", ParkovaciMisto.class);
+			
+			List<ParkovaciMisto> resultList = q.getResultList();
+			Map<String, Long> resultMap = new HashMap<String, Long>(resultList.size());
+			for (ParkovaciMisto result : resultList) {
+				JGeometry geo = JGeometry.load(result.getGeometry());
+				geometryMap.put(result.getIdMista().intValue(), geo);
+				System.out.print("result: " + result.getIdMista().toString() + ", geo: " + geo.toStringFull() + "\n");
+			}
+		}
+		catch (Exception e) {
+			System.out.print("loadObjects: " + e + "\n");
 		}
 		
 	}
