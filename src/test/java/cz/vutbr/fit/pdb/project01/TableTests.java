@@ -55,6 +55,7 @@ public class TableTests extends TestCase {
 
 	/**
 	 */
+	/*
 	public void testZonaTableCRUD() {
 		String testZonaName = "testZonaName";
 		String testZonaName2 = "testZonaName2";
@@ -69,7 +70,7 @@ public class TableTests extends TestCase {
 				Zona.delete(newZona2.getIdZony()));
 		assertTrue("New zona with name " + testZonaName2 + " should be deleted but is not",
 				!Zona.list().contains(newZona2));
-	}
+	}*/
 
 	private static BufferedImage toBufferedImage(Image src) {
 		int w = src.getWidth(null);
