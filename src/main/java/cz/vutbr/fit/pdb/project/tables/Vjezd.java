@@ -87,7 +87,6 @@ public class Vjezd extends TableBase implements java.io.Serializable {
 		try {
 			entityManager.getTransaction().begin();
 			Vjezd.setGeoVjezd(new JGeometryType(geoVjezd));
-			log.info("\n\n\nSave");
 			Vjezd = entityManager.merge(Vjezd);
 			entityManager.getTransaction().commit();
 		} catch (Exception e) {

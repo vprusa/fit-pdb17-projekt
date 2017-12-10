@@ -74,7 +74,7 @@ public class TableTests extends TestCase {
 		File pathToFile = new File(resourcesPath + "/resources/Hibernate_logo_a.png");
 		Image image = ImageIO.read(pathToFile);
 
-		Vozidlo vozidlo = Vozidlo.insert("tSpzU", image, image, Collections.emptySet());
+		Vozidlo vozidlo = Vozidlo.insert("tSpzU2", image, image, Collections.emptySet());
 		Vjezd vjezd = Vjezd.insert(geo);
 		Vyjezd vyjezd = Vyjezd.insert(geo2);
 		Date vjezd_1 = new Date();
@@ -96,6 +96,7 @@ public class TableTests extends TestCase {
 		assertTrue("New Pobyt with name " + testPobytName2 + " should be deleted but is not",
 				!Pobyt.list().contains(newPobyt2));
 
+		// clearing
 		assertTrue("Old vjezd with id " + vjezd.getIdVjezd() + "should be removable", Vjezd.delete(vjezd.getIdVjezd()));
 		assertTrue("Old vyjezd with id " + vyjezd.getIdVyjezd() + "should be removable",
 				Vyjezd.delete(vyjezd.getIdVyjezd()));
