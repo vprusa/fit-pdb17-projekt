@@ -21,12 +21,12 @@ import java.util.List;
 
 public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener, MouseMotionListener {
 
-	private Map<Integer, Shape> shapesMap = new HashMap<>();
-	private Map<Integer, JGeometry> geometryMap = new HashMap<>();
+	private Map<BigDecimal, Shape> shapesMap = new HashMap<>();
+	private Map<BigDecimal, JGeometry> geometryMap = new HashMap<>();
 	
 	private int pressedX;
 	private int pressedY;
-	private int selectedShape;
+	private BigDecimal selectedShape;
 	private boolean selectedShapeChanged = false;
 	
 	/**
@@ -36,16 +36,6 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		
-		int key = 0;
-		Shape shape = new Ellipse2D.Float(100.0f, 100.0f, 100.0f, 100.0f);
-		shapesMap.put(key++, shape);
-		
-		shape = new Ellipse2D.Float(50.0f, 50.0f, 50.0f, 50.0f);
-		shapesMap.put(key++, shape);
-		
-		shape = new Ellipse2D.Float(25.0f, 100.0f, 50.0f, 100.0f);
-		shapesMap.put(key++, shape);
 		
 		System.out.print("SpatialDataCanvasPanelForm\n");
 		try {
@@ -65,11 +55,15 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
         g2.setPaint(Color.white);
         g2.fill(bounds);
 
-        for (Map.Entry<Integer, Shape> shapeEntry : shapesMap.entrySet()) {
-        	
-            g2.setPaint( Color.cyan );
+        for (Map.Entry<BigDecimal, Shape> shapeEntry : shapesMap.entrySet()) {
+        	System.out.print("paintComponent: " + shapeEntry.getKey() + "\n");
+        	if (shapeEntry.getKey().equals(selectedShape)) {
+        		g2.setPaint(Color.green);
+        	} else {
+        		g2.setPaint(Color.cyan);
+        	}
             g2.fill(shapeEntry.getValue());
-            g2.setPaint( Color.black );
+            g2.setPaint(Color.black);
             g2.draw(shapeEntry.getValue());
         }
     }
@@ -94,14 +88,16 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		
 		selectedShape = shapeAt(pressedX, pressedY);
 		
-		System.out.print("mousePressed: " + e.getX() + ", " + e.getY() + "\n");
-		
+		System.out.print("selectedShape: " + selectedShape + "\n");	
+		repaint();
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if (selectedShapeChanged) {
 			// update shape (geometry) in sql db
+			saveSelectedShape();
+			selectedShapeChanged = false;
 		}
 	}
 
@@ -120,9 +116,12 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		
-		if(selectedShape != -1) {
+		if(selectedShape != null) {
 			int deltaX = e.getX() - pressedX;
 			int deltaY = e.getY() - pressedY;
+			
+			pressedX = e.getX();
+			pressedY = e.getY();
 		
 			moveSelectedShape(deltaX, deltaY);
 			selectedShapeChanged = true;
@@ -137,7 +136,7 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 	}
 	
 	
-	private int shapeAt(int x, int y) {
+	private BigDecimal shapeAt(int x, int y) {
 		// create some bigger triangle and check "anyinteract" with sql
 		// something like sql select on 
 		// SDO_RELATE(geometry, SDO_GEOMETRY(2003, NULL, NULL, SDO_ELEM_INFO_ARRAY(1,1003,4), SDO_ORDINATE_ARRAY(p1, p2, p3)), 'mask=anyinteract') = 'TRUE'")
@@ -156,19 +155,32 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 																			  						  + p3x + "," + p3y + ")), 'mask=anyinteract') = 'TRUE')", BigDecimal.class);
 			
 		
-			BigDecimal result = (BigDecimal) q.getSingleResult();
+			List<BigDecimal> result = q.getResultList();
 			
-			return result.intValue();
+			return result.get(0);
 		} catch (Exception e) {
 			System.out.print("shapeAt: " + e + "\n");
 		}
-		return -1;
+		return null;
 	}
 	
 	private void moveSelectedShape(int deltaX, int deltaY) {
 		// TODO Auto-generated method stub
 		// something like:
 		// getGeometry(selectedShape) -> move geometry -> convert to shape -> update in Map
+		
+		JGeometry geometry = geometryMap.get(selectedShape);
+		
+		System.out.print("deltaX: " + deltaX + ", deltaY: " + deltaY + "\n");
+        System.out.print("geometry.getNumPoints(): " + geometry.getNumPoints() + " ,geometry.getOrdinatesArray().length: " + geometry.getOrdinatesArray().length + "\n");
+
+        for (int i = 0; i < geometry.getOrdinatesArray().length; i = i + 2) {
+        	geometry.getOrdinatesArray()[i] = geometry.getOrdinatesArray()[i] + deltaX;
+            geometry.getOrdinatesArray()[i + 1] = geometry.getOrdinatesArray()[i + 1] + deltaY;
+        }
+
+        geometryMap.put(selectedShape, geometry);
+        shapesMap.put(selectedShape, geometry.createShape());
 		
 		repaint();
 		return;
@@ -181,8 +193,8 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 			List<ParkovaciMisto> resultList = q.getResultList();
 			for (ParkovaciMisto result : resultList) {
 				JGeometry geo = JGeometry.load(result.getGeometry());
-				geometryMap.put(result.getIdMista().intValue(), geo);
-				shapesMap.put(result.getIdMista().intValue(), geo.createShape());
+				geometryMap.put(result.getIdMista(), geo);
+				shapesMap.put(result.getIdMista(), geo.createShape());
 				System.out.print("result: " + result.getIdMista().toString() + ", geo: " + geo.toStringFull() + "\n");
 			}
 		}
@@ -190,6 +202,35 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 			System.out.print("loadObjects: " + e + "\n");
 		}
 		
+	}
+	
+	private void saveSelectedShape() {
+		// TODO Auto-generated method stub
+		ParkovaciMisto p = (ParkovaciMisto) TableBase.getEntityManager().find(ParkovaciMisto.class, selectedShape);
+		
+		//p.setGeometry(JGeometry.store(geometryMap.get(selectedShape)));
+
+	}
+	
+	private void newParking() {
+		;
+	}
+	
+	private void newCar() {
+		;
+	}
+	
+	private void newEntrance() {
+		;
+	}
+	
+	private void newExit() {
+		;
+	}
+	
+	public Object getSelectedObject() {
+		// something like: return objectsMap.get(selectedID);
+		return selectedShape;
 	}
 	
 
