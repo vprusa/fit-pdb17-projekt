@@ -15,6 +15,7 @@ import org.junit.Before;
 
 import cz.vutbr.fit.pdb.project.model.TableBase;
 import cz.vutbr.fit.pdb.project.tables.Vozidlo;
+import cz.vutbr.fit.pdb.project.tables.Vyjezd;
 import cz.vutbr.fit.pdb.project.tables.Zona;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -55,13 +56,34 @@ public class TableTests extends TestCase {
 	}
 
 	/**
+	 */
+	public void testVyjezdTableCRUD() {
+		String testVyjezdName = "testVyjezdName";
+		String testVyjezdName2 = "testVyjezdName2";
+		Vyjezd.list();
+
+		JGeometry geo = new JGeometry(0, 0, 10, 10, 1);
+		JGeometry geo2 = JGeometry.createCircle(0, 0, 10, 1);
+
+		Vyjezd newVyjezd = Vyjezd.insert(geo);
+		assertTrue("New Vyjezd with name " + testVyjezdName + " does not exists", Vyjezd.list().contains(newVyjezd));
+		Vyjezd newVyjezd2 = Vyjezd.update(newVyjezd.getIdVyjezd(), geo2);
+		assertTrue("New Vyjezd with name " + testVyjezdName2 + " should not be null but is", newVyjezd2 != null);
+		assertTrue("New Vyjezd with original name " + testVyjezdName + " should be updatable with new name "
+				+ testVyjezdName2 + " but is not", newVyjezd2.getIdVyjezd().equals(newVyjezd.getIdVyjezd()));
+		assertTrue("New Vyjezd with original name " + testVyjezdName + " should be deletable but is not",
+				Vyjezd.delete(newVyjezd2.getIdVyjezd()));
+		assertTrue("New Vyjezd with name " + testVyjezdName2 + " should be deleted but is not",
+				!Vyjezd.list().contains(newVyjezd2));
+	}
+
+	/**
 	 * duplicite with GeometryTest
 	 */
 	public void testZonaTableCRUD() {
 		String testZonaName = "testZonaName";
 		String testZonaName2 = "testZonaName2";
 		Zona.list();
-		log.info("listed\n\n");
 
 		JGeometry geo = new JGeometry(0, 0, 10, 10, 1);
 		JGeometry geo2 = JGeometry.createCircle(0, 0, 10, 1);
