@@ -50,7 +50,6 @@ public class JGeometryType implements UserType, Serializable {
 	 * This default constructor does create an instance of 1 point at origin
 	 */
 	public JGeometryType() {
-		LOGGER.info("\n\n\nStoring not null");
 		geometryInstance = new JGeometry(0, 0, 0);
 	}
 
@@ -169,7 +168,6 @@ public class JGeometryType implements UserType, Serializable {
 				if (gt.getJGeometry() == null) {
 					preparedStatement.setNull(i, Types.STRUCT, "MDSYS.SDO_GEOMETRY");
 				} else {
-					LOGGER.info("\n\n smth");
 					preparedStatement.setObject(i, JGeometry.store((JGeometry) (gt).getJGeometry(), oc));
 				}
 			}
