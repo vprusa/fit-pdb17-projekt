@@ -98,7 +98,7 @@ public class LoginForm extends JFrame {
 
 		url = new JTextField();
 
-		url.setText("jdbc:oracle:thin:@//gort.fit.vutbr.cz:1521/gort");
+		url.setText("jdbc:oracle:thin:@//gort.fit.vutbr.cz:1521/gort.fit.vutbr.cz");
 		urlPanel.add(url);
 		url.setColumns(30);
 
