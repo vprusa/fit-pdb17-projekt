@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.Date;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
@@ -14,6 +16,9 @@ import org.jboss.logging.Logger;
 import org.junit.Before;
 
 import cz.vutbr.fit.pdb.project.model.TableBase;
+import cz.vutbr.fit.pdb.project.tables.Parkovani;
+import cz.vutbr.fit.pdb.project.tables.Pobyt;
+import cz.vutbr.fit.pdb.project.tables.Vjezd;
 import cz.vutbr.fit.pdb.project.tables.Vozidlo;
 import cz.vutbr.fit.pdb.project.tables.Vyjezd;
 import cz.vutbr.fit.pdb.project.tables.Zona;
@@ -53,6 +58,72 @@ public class TableTests extends TestCase {
 	public void setUp() {
 		log.info("Run this method before each test");
 		TableBase.login(null, null, null);
+	}
+
+	/**
+	 * @throws IOException
+	 */
+	public void testPobytTableCRUD() throws IOException {
+		String testPobytName = "testPobytName";
+		String testPobytName2 = "testPobytName2";
+
+		JGeometry geo = new JGeometry(0, 0, 10, 10, 1);
+		JGeometry geo2 = JGeometry.createCircle(20, 20, 10, 1);
+
+		String resourcesPath = "./";
+		File pathToFile = new File(resourcesPath + "/resources/Hibernate_logo_a.png");
+		Image image = ImageIO.read(pathToFile);
+
+		Vozidlo vozidlo = Vozidlo.insert("tSpzU", image, image, Collections.emptySet());
+		Vjezd vjezd = Vjezd.insert(geo);
+		Vyjezd vyjezd = Vyjezd.insert(geo2);
+		Date vjezd_1 = new Date();
+		Date vyjezd_1 = new Date();
+		Date vyjezd_1_2 = new Date(); // updating
+		Set<Parkovani> parkovanis = Collections.emptySet();
+
+		Pobyt.list();
+		log.info("listed\n\n");
+
+		Pobyt newPobyt = Pobyt.insert(vjezd, vozidlo, vyjezd, vjezd_1, vyjezd_1, parkovanis);
+		assertTrue("New Pobyt with name " + testPobytName + " does not exists", Pobyt.list().contains(newPobyt));
+		Pobyt newPobyt2 = Pobyt.update(newPobyt.getIdPobyt(), vjezd, vozidlo, vyjezd, vjezd_1, vyjezd_1_2, parkovanis);
+		assertTrue("New Pobyt with name " + testPobytName2 + " should not be null but is", newPobyt2 != null);
+		assertTrue("New Pobyt with original name " + testPobytName + " should be updatable with new date "
+				+ testPobytName2 + " but is not", newPobyt2.getVyjezd_1().equals(newPobyt.getVyjezd_1()));
+		assertTrue("New Pobyt with original name " + testPobytName + " should be deletable but is not",
+				Pobyt.delete(newPobyt2.getIdPobyt()));
+		assertTrue("New Pobyt with name " + testPobytName2 + " should be deleted but is not",
+				!Pobyt.list().contains(newPobyt2));
+
+		assertTrue("Old vjezd with id " + vjezd.getIdVjezd() + "should be removable", Vjezd.delete(vjezd.getIdVjezd()));
+		assertTrue("Old vyjezd with id " + vyjezd.getIdVyjezd() + "should be removable",
+				Vyjezd.delete(vyjezd.getIdVyjezd()));
+		assertTrue("Old vozidlo with id " + vozidlo.getSpz() + "should be removable", Vozidlo.delete(vozidlo.getSpz()));
+
+	}
+
+	/**
+	 */
+	public void testVjezdTableCRUD() {
+		String testVjezdName = "testVjezdName";
+		String testVjezdName2 = "testVjezdName2";
+		Vjezd.list();
+		log.info("listed\n\n");
+
+		JGeometry geo = new JGeometry(0, 0, 10, 10, 1);
+		JGeometry geo2 = JGeometry.createCircle(0, 0, 10, 1);
+
+		Vjezd newVjezd = Vjezd.insert(geo);
+		assertTrue("New Vjezd with name " + testVjezdName + " does not exists", Vjezd.list().contains(newVjezd));
+		Vjezd newVjezd2 = Vjezd.update(newVjezd.getIdVjezd(), geo2);
+		assertTrue("New Vjezd with name " + testVjezdName2 + " should not be null but is", newVjezd2 != null);
+		assertTrue("New Vjezd with original name " + testVjezdName + " should be updatable with new name "
+				+ testVjezdName2 + " but is not", newVjezd2.getIdVjezd().equals(newVjezd.getIdVjezd()));
+		assertTrue("New Vjezd with original name " + testVjezdName + " should be deletable but is not",
+				Vjezd.delete(newVjezd2.getIdVjezd()));
+		assertTrue("New Vjezd with name " + testVjezdName2 + " should be deleted but is not",
+				!Vjezd.list().contains(newVjezd2));
 	}
 
 	/**

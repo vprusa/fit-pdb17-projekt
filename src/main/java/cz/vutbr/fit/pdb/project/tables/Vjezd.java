@@ -37,9 +37,11 @@ public class Vjezd extends TableBase implements java.io.Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vjezd_seq")
 	@SequenceGenerator(name = "vjezd_seq", sequenceName = "vjezd_seq", allocationSize = 1, initialValue = 1)
 	private Long idVjezd;
+	
 	@Column(name = "GEO_VJEZD")
 	@Type(type = "JGeometryType")
 	private JGeometryType geoVjezd;
+	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "vjezd")
 	private Set<Pobyt> pobyts = new HashSet<Pobyt>(0);
 
