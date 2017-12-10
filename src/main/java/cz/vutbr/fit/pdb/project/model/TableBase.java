@@ -67,5 +67,9 @@ public class TableBase {
 		}
 		return false;
 	}
+	
+	public static EntityManager getEntityManager() {
+		return entityManager;
+	}
 
 }
