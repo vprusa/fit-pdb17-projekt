@@ -1,15 +1,15 @@
-DROP TABLE zona;
-DROP TABLE vozidlo;
-DROP TABLE parkovaci_misto;
-DROP TABLE pobyt;
-DROP TABLE parkovani;
-DROP TABLE vjezd;
-DROP TABLE vyjezd;
+DROP TABLE zona CASCADE CONSTRAINTS;
+DROP TABLE vozidlo CASCADE CONSTRAINTS;
+DROP TABLE parkovaci_misto CASCADE CONSTRAINTS;
+DROP TABLE pobyt CASCADE CONSTRAINTS;
+DROP TABLE parkovani CASCADE CONSTRAINTS;
+DROP TABLE vjezd CASCADE CONSTRAINTS;
+DROP TABLE vyjezd CASCADE CONSTRAINTS;
 
 CREATE TABLE zona(
     id_zony number not null,
     nazev_zony VARCHAR(50),
-    -- geometrie SDO_GEOMETRY,
+    geo_zony SDO_GEOMETRY,
     CONSTRAINT pk_id_zony primary key (id_zony)
 );
 
@@ -26,6 +26,7 @@ CREATE TABLE vozidlo(
 CREATE TABLE parkovaci_misto(
     id_mista number  NOT null,
     pozn varchar(255),
+    geo_mista SDO_GEOMETRY,
     CONSTRAINT id_mista_pk primary key (id_mista)
 );
 
@@ -34,6 +35,7 @@ create sequence parkovaci_misto_seq start with 1 increment by 1;
 
 CREATE TABLE vjezd(
     id_vjezd NUMBER NOT null,
+    geo_vjezd SDO_GEOMETRY,
     CONSTRAINT pk_vjezd PRIMARY KEY(id_vjezd)
 );
 
@@ -43,6 +45,7 @@ create sequence vjezd_seq start with 1 increment by 1;
 
 CREATE TABLE vyjezd(
     id_vyjezd NUMBER NOT null,
+    geo_vyjezd SDO_GEOMETRY,
     CONSTRAINT pk_vyjezd PRIMARY KEY(id_vyjezd)
 );
 
@@ -79,4 +82,3 @@ CREATE TABLE parkovani(
 
 drop sequence parkovani_seq;
 create sequence parkovani_seq start with 1 increment by 1;
-
