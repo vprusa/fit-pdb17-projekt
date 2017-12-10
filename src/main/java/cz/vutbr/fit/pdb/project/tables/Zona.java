@@ -29,8 +29,6 @@ import oracle.spatial.geometry.JGeometry;
  */
 @Entity
 @Table(name = "ZONA")
-@TypeDefs(value = {
-		@TypeDef(name = "JGeometryType", typeClass = cz.vutbr.fit.pdb.project.tables.entities.JGeometryType.class) })
 public class Zona extends TableBase implements java.io.Serializable {
 
 	@Id
@@ -87,7 +85,7 @@ public class Zona extends TableBase implements java.io.Serializable {
 		this.geoZony = geoZony;
 	}
 
-	public static Zona save(String ZonaName, JGeometry geoZony) {
+	public static Zona insert(String ZonaName, JGeometry geoZony) {
 		Zona zona = new Zona();
 		try {
 			entityManager.getTransaction().begin();

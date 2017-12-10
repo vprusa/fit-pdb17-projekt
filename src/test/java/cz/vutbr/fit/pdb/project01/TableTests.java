@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import oracle.jdbc.OracleResultSet;
 import oracle.ord.im.OrdImage;
+import oracle.spatial.geometry.JGeometry;
 
 /**
  * Unit test for simple App.
@@ -54,15 +55,20 @@ public class TableTests extends TestCase {
 	}
 
 	/**
+	 * duplicite with GeometryTest
 	 */
-	/*
 	public void testZonaTableCRUD() {
 		String testZonaName = "testZonaName";
 		String testZonaName2 = "testZonaName2";
+		Zona.list();
+		log.info("listed\n\n");
 
-		Zona newZona = Zona.save(testZonaName);
+		JGeometry geo = new JGeometry(0, 0, 10, 10, 1);
+		JGeometry geo2 = JGeometry.createCircle(0, 0, 10, 1);
+
+		Zona newZona = Zona.insert(testZonaName, geo);
 		assertTrue("New zona with name " + testZonaName + " does not exists", Zona.list().contains(newZona));
-		Zona newZona2 = Zona.update(newZona.getIdZony(), testZonaName2);
+		Zona newZona2 = Zona.update(newZona.getIdZony(), testZonaName2, geo2);
 		assertTrue("New zona with name " + testZonaName2 + " should not be null but is", newZona2 != null);
 		assertTrue("New zona with original name " + testZonaName + " should be updatable with new name " + testZonaName2
 				+ " but is not", newZona2.getNazevZony().equals(testZonaName2));
@@ -70,7 +76,7 @@ public class TableTests extends TestCase {
 				Zona.delete(newZona2.getIdZony()));
 		assertTrue("New zona with name " + testZonaName2 + " should be deleted but is not",
 				!Zona.list().contains(newZona2));
-	}*/
+	}
 
 	private static BufferedImage toBufferedImage(Image src) {
 		int w = src.getWidth(null);
@@ -93,7 +99,7 @@ public class TableTests extends TestCase {
 		Image image = ImageIO.read(pathToFile);
 		String testVozidloSpz = "Spz";
 		log.info("Creating new vizidlo");
-		Vozidlo newVozidlo = Vozidlo.save(testVozidloSpz, image, image, Collections.emptySet());
+		Vozidlo newVozidlo = Vozidlo.insert(testVozidloSpz, image, image, Collections.emptySet());
 		assertTrue("New vozidlo with name " + testVozidloSpz + " does not exists and should",
 				Vozidlo.list().contains(newVozidlo));
 
