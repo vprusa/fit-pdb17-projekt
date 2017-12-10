@@ -21,6 +21,7 @@ import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
 import cz.vutbr.fit.pdb.project.model.TableBase;
+import cz.vutbr.fit.pdb.project.tables.entities.JGeometryType;
 import oracle.spatial.geometry.JGeometry;
 
 /**
@@ -29,7 +30,7 @@ import oracle.spatial.geometry.JGeometry;
 @Entity
 @Table(name = "ZONA")
 @TypeDefs(value = {
-		@TypeDef(name = "JGeometry", typeClass = cz.vutbr.fit.pdb.project.tables.entities.JGeometryType.class) })
+		@TypeDef(name = "JGeometryType", typeClass = cz.vutbr.fit.pdb.project.tables.entities.JGeometryType.class) })
 public class Zona extends TableBase implements java.io.Serializable {
 
 	@Id
@@ -41,7 +42,8 @@ public class Zona extends TableBase implements java.io.Serializable {
 	private String nazevZony = "";
 
 	@Column(name = "GEO_ZONY")
-	private JGeometry geoZony;
+	@Type(type = "JGeometryType")
+	private JGeometryType geoZony;
 
 	public Zona() {
 	}
@@ -53,7 +55,7 @@ public class Zona extends TableBase implements java.io.Serializable {
 	public Zona(Long idZony, String nazevZony, JGeometry geoZony) {
 		this.idZony = idZony;
 		this.nazevZony = nazevZony;
-		this.geoZony = geoZony;
+		this.geoZony = new JGeometryType(geoZony);
 	}
 
 	public Long getIdZony() {
@@ -73,13 +75,15 @@ public class Zona extends TableBase implements java.io.Serializable {
 		this.nazevZony = nazevZony;
 	}
 
-	@Column(name = "GEO_ZONY")
-	@Type(type = "JGeometry")
-	public JGeometry getGeoZony() {
+	public JGeometryType getGeoZony() {
 		return this.geoZony;
 	}
 
-	public void setGeoZony(JGeometry geoZony) {
+	public JGeometry getJGeoZony() {
+		return (this.geoZony == null ? null : this.geoZony.getJGeometry());
+	}
+
+	public void setGeoZony(JGeometryType geoZony) {
 		this.geoZony = geoZony;
 	}
 
@@ -87,8 +91,8 @@ public class Zona extends TableBase implements java.io.Serializable {
 		Zona zona = new Zona();
 		try {
 			entityManager.getTransaction().begin();
-			zona.setNazevZony(ZonaName);	
-			zona.setGeoZony(geoZony);
+			zona.setNazevZony(ZonaName);
+			zona.setGeoZony(new JGeometryType(geoZony));
 			log.info("\n\n\nSave");
 			zona = entityManager.merge(zona);
 			entityManager.getTransaction().commit();
@@ -107,7 +111,7 @@ public class Zona extends TableBase implements java.io.Serializable {
 			for (Iterator<Zona> iterator = Zonas.iterator(); iterator.hasNext();) {
 				Zona Zona = (Zona) iterator.next();
 				System.out.println(Zona.getNazevZony());
-				System.out.println(Zona.getGeoZony().toGeoJson());
+				System.out.println(Zona.getGeoZony().getJGeometry().toGeoJson());
 			}
 			entityManager.getTransaction().commit();
 			return Zonas;
@@ -127,7 +131,7 @@ public class Zona extends TableBase implements java.io.Serializable {
 				return null;
 			}
 			zona.setNazevZony(ZonaName);
-			zona.setGeoZony(geoZony);
+			zona.setGeoZony(new JGeometryType(geoZony));
 			entityManager.getTransaction().commit();
 			log.info("entityManager.getTransaction().commit();");
 			log.info(zona.getNazevZony());

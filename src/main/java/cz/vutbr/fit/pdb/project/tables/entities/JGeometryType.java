@@ -145,7 +145,6 @@ public class JGeometryType implements UserType, Serializable {
 	@Override
 	public Object nullSafeGet(ResultSet resultSet, String[] strings, final SessionImplementor sessionImplementor,
 			Object o) throws HibernateException, SQLException {
-		LOGGER.info("\n\nullSafeGet");
 		final STRUCT geometry = (STRUCT) resultSet.getObject(strings[0]);
 		return resultSet.wasNull() || geometry == null ? null : new JGeometryType(JGeometry.load(geometry));
 	}
@@ -154,7 +153,7 @@ public class JGeometryType implements UserType, Serializable {
 	@Override
 	public void nullSafeSet(PreparedStatement preparedStatement, Object o, int i, SessionImplementor sessionImplementor)
 			throws HibernateException, SQLException {
-		LOGGER.info("\n\nnullSafeSet");
+
 		if (o == null) {
 			preparedStatement.setNull(i, Types.STRUCT, "MDSYS.SDO_GEOMETRY");
 		} else {
@@ -170,6 +169,7 @@ public class JGeometryType implements UserType, Serializable {
 				if (gt.getJGeometry() == null) {
 					preparedStatement.setNull(i, Types.STRUCT, "MDSYS.SDO_GEOMETRY");
 				} else {
+					LOGGER.info("\n\n smth");
 					preparedStatement.setObject(i, JGeometry.store((JGeometry) (gt).getJGeometry(), oc));
 				}
 			}
