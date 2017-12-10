@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Ellipse2D;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -140,7 +141,28 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		// create some bigger triangle and check "anyinteract" with sql
 		// something like sql select on 
 		// SDO_RELATE(geometry, SDO_GEOMETRY(2003, NULL, NULL, SDO_ELEM_INFO_ARRAY(1,1003,4), SDO_ORDINATE_ARRAY(p1, p2, p3)), 'mask=anyinteract') = 'TRUE'")
-		return 0;
+		int size = 3;
+		int p1x = x + size; int p1y = y - size;
+		int p2x = x - size; int p2y = y + size;
+		int p3x = x + size; int p3y = y + size;
+		try {
+			
+			Query q = TableBase.getEntityManager().createQuery("SELECT id "
+															 + "FROM ParkovaciMisto "
+															 + "WHERE SDO_RELATE(geometry, "
+																			  + "SDO_GEOMETRY(2003, NULL, NULL, SDO_ELEM_INFO_ARRAY(1, 1003, 4), "
+																			  + "SDO_ORDINATE_ARRAY(" + p1x + "," + p1y + ", "
+																			  						  + p2x + "," + p2y + ", " 
+																			  						  + p3x + "," + p3y + ")), 'mask=anyinteract') = 'TRUE')", BigDecimal.class);
+			
+		
+			BigDecimal result = (BigDecimal) q.getSingleResult();
+			
+			return result.intValue();
+		} catch (Exception e) {
+			System.out.print("shapeAt: " + e + "\n");
+		}
+		return -1;
 	}
 	
 	private void moveSelectedShape(int deltaX, int deltaY) {
@@ -157,10 +179,10 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 			Query q = TableBase.getEntityManager().createQuery("SELECT p FROM ParkovaciMisto p", ParkovaciMisto.class);
 			
 			List<ParkovaciMisto> resultList = q.getResultList();
-			Map<String, Long> resultMap = new HashMap<String, Long>(resultList.size());
 			for (ParkovaciMisto result : resultList) {
 				JGeometry geo = JGeometry.load(result.getGeometry());
 				geometryMap.put(result.getIdMista().intValue(), geo);
+				shapesMap.put(result.getIdMista().intValue(), geo.createShape());
 				System.out.print("result: " + result.getIdMista().toString() + ", geo: " + geo.toStringFull() + "\n");
 			}
 		}

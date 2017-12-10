@@ -71,5 +71,9 @@ public class TableBase {
 	public static EntityManager getEntityManager() {
 		return entityManager;
 	}
+	
+	public static void closeManager() {
+		emf.close();
+	}
 
 }

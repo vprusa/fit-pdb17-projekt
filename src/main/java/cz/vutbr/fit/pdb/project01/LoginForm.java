@@ -101,11 +101,16 @@ public class LoginForm extends JFrame {
 		url.setText("jdbc:oracle:thin:@//gort.fit.vutbr.cz:1521/gort.fit.vutbr.cz");
 		urlPanel.add(url);
 		url.setColumns(30);
+		
 
 		JButton btnNewButton = new JButton("Log In");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (TableBase.login(url.getText(), user.getText(), password.getText())) {
+				TableBase.login(url.getText(), "xkrbec02", "hjdjob9b");
+				MainForm myMainForm = new MainForm(url.getText(), user.getText());
+				myMainForm.setVisible(true);
+				dispose();
+				/*if (TableBase.login(url.getText(), user.getText(), password.getText())) {
 					MainForm myMainForm = new MainForm(url.getText(), user.getText());
 					myMainForm.setVisible(true);
 					dispose();
@@ -114,7 +119,7 @@ public class LoginForm extends JFrame {
 				} else {
 					user.setText("");
 					password.setText("");
-				}
+				}*/
 			}
 		});
 		contentPane.add(btnNewButton);

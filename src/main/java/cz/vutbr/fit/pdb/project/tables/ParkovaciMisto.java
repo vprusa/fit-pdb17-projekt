@@ -35,9 +35,10 @@ public class ParkovaciMisto implements java.io.Serializable {
 		this.idMista = idMista;
 	}
 
-	public ParkovaciMisto(BigDecimal idMista, String pozn, Set<Parkovani> parkovanis) {
+	public ParkovaciMisto(BigDecimal idMista, String pozn, byte[] geometryRaw, Set<Parkovani> parkovanis) {
 		this.idMista = idMista;
 		this.pozn = pozn;
+		this.geometryRaw = geometryRaw;
 		this.parkovanis = parkovanis;
 	}
 

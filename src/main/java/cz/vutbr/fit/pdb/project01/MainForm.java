@@ -7,6 +7,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import cz.vutbr.fit.pdb.project.model.TableBase;
+
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import java.awt.CardLayout;
@@ -18,6 +20,7 @@ import java.awt.GridLayout;
 import javax.swing.JLabel;
 import java.awt.FlowLayout;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import javax.swing.AbstractListModel;
 import javax.swing.JScrollPane;
@@ -30,6 +33,8 @@ import java.awt.Choice;
 import java.awt.Color;
 import javax.swing.JTable;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.event.ActionEvent;
 import javax.swing.Box;
 
@@ -75,7 +80,53 @@ public class MainForm extends JFrame {
 	 * Create the frame.
 	 */
 	public MainForm(String url, String login) {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		addWindowListener(new WindowListener() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				System.out.print("MainForm about to close.");
+		    	TableBase.closeManager();
+				dispose();
+		        System.exit(0);
+			}
+
+			@Override
+			public void windowOpened(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowIconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1000, 800);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
