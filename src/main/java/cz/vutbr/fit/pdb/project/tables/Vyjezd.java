@@ -150,5 +150,18 @@ public class Vyjezd extends TableBase implements java.io.Serializable {
 		}
 		return true;
 	}
+	
+	public static Long selectObjectByGeometry(JGeometryType geometry) {
+		try {
+			entityManager.getTransaction().begin();
+			List<Vyjezd> result = entityManager.createQuery("from Vyjezd WHERE SDO_RELATE(geoVyjezd, :geo, 'mask=anyinteract') = 'TRUE')", Vyjezd.class).setParameter("geo", geometry).getResultList();
+			entityManager.getTransaction().commit();
+			return result.isEmpty() ? null : result.get(0).getIdVyjezd();
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 }

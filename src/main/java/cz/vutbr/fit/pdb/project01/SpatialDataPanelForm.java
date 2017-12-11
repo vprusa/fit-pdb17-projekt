@@ -1,8 +1,17 @@
 package cz.vutbr.fit.pdb.project01;
 
 
+import javax.persistence.criteria.CriteriaBuilder.Case;
 import javax.swing.*;
+
+import cz.vutbr.fit.pdb.project.tables.ParkovaciMisto;
+import cz.vutbr.fit.pdb.project.tables.Vjezd;
+import cz.vutbr.fit.pdb.project.tables.Vyjezd;
+import cz.vutbr.fit.pdb.project01.SpatialDataCanvasPanelForm.SpatialType;
+
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class SpatialDataPanelForm extends JPanel {
 
@@ -25,6 +34,7 @@ public class SpatialDataPanelForm extends JPanel {
 	private JTextField deleteFrom;
 	private JTextField deleteTo;
 	private JTable currentResidence;
+	private SpatialDataCanvasPanelForm canvasPanel;
 	
 	/**
 	 * Create the panel.
@@ -36,7 +46,7 @@ public class SpatialDataPanelForm extends JPanel {
 	    JPanel canvasPanelWrap = new JPanel();
 	    canvasPanelWrap.setLayout(new GridLayout());
 	    canvasPanelWrap.setMinimumSize(new Dimension(400, getHeight()));
-	    SpatialDataCanvasPanelForm canvasPanel = new SpatialDataCanvasPanelForm();
+	    canvasPanel = new SpatialDataCanvasPanelForm(this);
 	    canvasPanelWrap.add(canvasPanel);
 		
 		add(canvasPanelWrap);
@@ -59,6 +69,28 @@ public class SpatialDataPanelForm extends JPanel {
 		addPanel.add(elementChoice);
 		
 		JButton btnAddElement = new JButton("Přidat");
+		btnAddElement.addActionListener(new ActionListener() {
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+		    	switch(elementChoice.getSelectedItem()) {
+		    	case "Auto":
+		    		//canvasPanel.
+		    		break;
+		    		
+		    	case "Parkovací místo":
+		    		canvasPanel.addParkPlace();
+		    	break;
+		    	
+		    	case "Vjezd":
+		    		canvasPanel.addEntrance();
+		    		break;
+		    		
+		    	case "Výjezd":
+		    		canvasPanel.addExit();
+		    		break;
+		    	}
+		    }
+		});
 		addPanel.add(btnAddElement);
 		
 		Component verticalStrut = Box.createVerticalStrut(20);
@@ -166,6 +198,12 @@ public class SpatialDataPanelForm extends JPanel {
 		averageStay.setColumns(10);
 		
 		JButton btnDeleteElement = new JButton("Smazat položku");
+		btnDeleteElement.addActionListener(new ActionListener() {
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+		        canvasPanel.deleteSelected();
+		    }
+		});
 		elementSelectonPanel.add(btnDeleteElement);
 		
 		JPanel distanceMeasuringPanel = new JPanel();
@@ -186,6 +224,42 @@ public class SpatialDataPanelForm extends JPanel {
 		textField.setColumns(10);
 		
 		setVisible(true);
+	}
+	
+	public void onObjectSelected() {
+		
+		switch(canvasPanel.getSelectedObjectType()) {
+		case parkPlace:
+			ParkovaciMisto parkPlace = canvasPanel.getParkPlaceByID(canvasPanel.getSelectedObjectID());
+			id.setText(parkPlace.getIdMista().toString());
+			elementType.setText("Parkovací místo");
+			ElementName.setText(parkPlace.getPozn());
+			parrentZone.setText("-");
+			break;
+			
+		case entrance:
+			Vjezd entrance = canvasPanel.getEntranceByID(canvasPanel.getSelectedObjectID());
+			id.setText(entrance.getIdVjezd().toString());
+			elementType.setText("Vjezd");
+			ElementName.setText("-");
+			parrentZone.setText("-");
+			break;
+			
+		case exit:
+			Vyjezd exit = canvasPanel.getExitByID(canvasPanel.getSelectedObjectID());
+			id.setText(exit.getIdVyjezd().toString());
+			elementType.setText("Vyjezd");
+			ElementName.setText("-");
+			parrentZone.setText("-");
+			break;
+			
+		case nothing:
+			id.setText("-");
+			elementType.setText("-");
+			ElementName.setText("-");
+			parrentZone.setText("-");
+			break;
+		}
 	}
 
 }
