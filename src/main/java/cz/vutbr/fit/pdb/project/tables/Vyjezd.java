@@ -14,6 +14,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -39,9 +41,9 @@ public class Vyjezd extends TableBase implements java.io.Serializable {
 	@SequenceGenerator(name = "vyjezd_seq", sequenceName = "vyjezd_seq", allocationSize = 1, initialValue = 1)
 	private Long idVyjezd;
 
-	@Column(name = "GEO_VYJEZD")
-	@Type(type = "JGeometryType")
-	private JGeometryType geoVyjezd;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "ZONA_ID", nullable = false)
+	private Zona zona;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "vyjezd")
 	private Set<Pobyt> pobyts = new HashSet<Pobyt>(0);
@@ -53,9 +55,9 @@ public class Vyjezd extends TableBase implements java.io.Serializable {
 		this.idVyjezd = idVyjezd;
 	}
 
-	public Vyjezd(Long idVyjezd, JGeometryType geoVyjezd, Set<Pobyt> pobyts) {
+	public Vyjezd(Long idVyjezd, Zona zona, Set<Pobyt> pobyts) {
 		this.idVyjezd = idVyjezd;
-		this.geoVyjezd = geoVyjezd;
+		this.zona = zona;
 		this.pobyts = pobyts;
 	}
 
@@ -67,12 +69,16 @@ public class Vyjezd extends TableBase implements java.io.Serializable {
 		this.idVyjezd = idVyjezd;
 	}
 
-	public JGeometryType getGeoVyjezd() {
-		return this.geoVyjezd;
+	public JGeometry getJGeometry() {
+		return this.zona.getJGeoZony();
 	}
 
-	public void setGeoVyjezd(JGeometryType geoVyjezd) {
-		this.geoVyjezd = geoVyjezd;
+	public Zona getZona() {
+		return this.zona;
+	}
+
+	public void setZona(Zona zona) {
+		this.zona = zona;
 	}
 
 	public Set<Pobyt> getPobyts() {
@@ -83,11 +89,11 @@ public class Vyjezd extends TableBase implements java.io.Serializable {
 		this.pobyts = pobyts;
 	}
 
-	public static Vyjezd insert(JGeometry geoVyjezd) {
+	public static Vyjezd insert(Zona zona) {
 		Vyjezd Vyjezd = new Vyjezd();
 		try {
 			entityManager.getTransaction().begin();
-			Vyjezd.setGeoVyjezd(new JGeometryType(geoVyjezd));
+			Vyjezd.setZona(zona);
 			log.info("\n\n\nSave");
 			Vyjezd = entityManager.merge(Vyjezd);
 			entityManager.getTransaction().commit();
@@ -98,6 +104,21 @@ public class Vyjezd extends TableBase implements java.io.Serializable {
 		return Vyjezd;
 	}
 
+	public static Vyjezd getByZona(Zona zona) {
+		try {
+			entityManager.getTransaction().begin();
+			@SuppressWarnings("unchecked")
+			Vyjezd parkovaciMistos = (Vyjezd) entityManager.createQuery("from Vyjezd where ZONA_ID = :id")
+					.setParameter("id", zona.getIdZony()).getSingleResult();
+			entityManager.getTransaction().commit();
+			return parkovaciMistos;
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+		//	e.printStackTrace();
+		}
+		return null;
+	}
+
 	public static List<Vyjezd> list() {
 		try {
 			entityManager.getTransaction().begin();
@@ -106,7 +127,7 @@ public class Vyjezd extends TableBase implements java.io.Serializable {
 			for (Iterator<Vyjezd> iterator = Vyjezds.iterator(); iterator.hasNext();) {
 				Vyjezd Vyjezd = (Vyjezd) iterator.next();
 				System.out.println(Vyjezd.getIdVyjezd());
-				System.out.println(Vyjezd.getGeoVyjezd().getJGeometry().toGeoJson());
+				// System.out.println(Vyjezd.getZona().getGeoZony().getJGeometry().toGeoJson());
 			}
 			entityManager.getTransaction().commit();
 			return Vyjezds;
@@ -117,7 +138,7 @@ public class Vyjezd extends TableBase implements java.io.Serializable {
 		return Collections.emptyList();
 	}
 
-	public static Vyjezd update(Long VyjezdId, JGeometry geoVyjezd) {
+	public static Vyjezd update(Long VyjezdId, Zona zona) {
 		log.info("Vyjezd.update");
 		try {
 			entityManager.getTransaction().begin();
@@ -125,10 +146,11 @@ public class Vyjezd extends TableBase implements java.io.Serializable {
 			if (Vyjezd == null) {
 				return null;
 			}
-			Vyjezd.setGeoVyjezd(new JGeometryType(geoVyjezd));
+			// Vyjezd.setGeoVyjezd(new JGeometryType(geoVyjezd));
+			Vyjezd.setZona(zona);// (new JGeometryType(geoVyjezd));
 			entityManager.getTransaction().commit();
 			log.info(Vyjezd.getIdVyjezd());
-			log.info(Vyjezd.getGeoVyjezd());
+			// log.info(Vyjezd.getGeoVyjezd());
 			return Vyjezd;
 		} catch (Exception e) {
 			entityManager.getTransaction().rollback();
@@ -149,19 +171,6 @@ public class Vyjezd extends TableBase implements java.io.Serializable {
 			return false;
 		}
 		return true;
-	}
-	
-	public static Long selectObjectByGeometry(JGeometryType geometry) {
-		try {
-			entityManager.getTransaction().begin();
-			List<Vyjezd> result = entityManager.createQuery("from Vyjezd WHERE SDO_RELATE(geoVyjezd, :geo, 'mask=anyinteract') = 'TRUE')", Vyjezd.class).setParameter("geo", geometry).getResultList();
-			entityManager.getTransaction().commit();
-			return result.isEmpty() ? null : result.get(0).getIdVyjezd();
-		} catch (Exception e) {
-			entityManager.getTransaction().rollback();
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 }

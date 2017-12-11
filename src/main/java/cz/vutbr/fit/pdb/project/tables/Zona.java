@@ -2,16 +2,20 @@ package cz.vutbr.fit.pdb.project.tables;
 // Generated Nov 28, 2017 5:54:05 PM by Hibernate Tools 4.3.5.Final
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Persistence;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -43,6 +47,13 @@ public class Zona extends TableBase implements java.io.Serializable {
 	@Type(type = "JGeometryType")
 	private JGeometryType geoZony;
 
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "zona")
+	private Set<Vyjezd> vyjezds = new HashSet<Vyjezd>(0);
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "zona")
+	private Set<Vjezd> vjezds = new HashSet<Vjezd>(0);
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "zona")
+	private Set<ParkovaciMisto> parkovaciMistos = new HashSet<ParkovaciMisto>(0);
+
 	public Zona() {
 	}
 
@@ -50,10 +61,38 @@ public class Zona extends TableBase implements java.io.Serializable {
 		this.idZony = idZony;
 	}
 
-	public Zona(Long idZony, String nazevZony, JGeometry geoZony) {
+	public Zona(Long idZony, String nazevZony, JGeometry geoZony, Set<Vyjezd> vyjezds, Set<Vjezd> vjezds,
+			Set<ParkovaciMisto> parkovaciMistos) {
 		this.idZony = idZony;
 		this.nazevZony = nazevZony;
 		this.geoZony = new JGeometryType(geoZony);
+		this.vyjezds = vyjezds;
+		this.vjezds = vjezds;
+		this.parkovaciMistos = parkovaciMistos;
+	}
+
+	public Set<Vyjezd> getVyjezds() {
+		return this.vyjezds;
+	}
+
+	public void setVyjezds(Set<Vyjezd> vyjezds) {
+		this.vyjezds = vyjezds;
+	}
+
+	public Set<Vjezd> getVjezds() {
+		return this.vjezds;
+	}
+
+	public void setVjezds(Set<Vjezd> vjezds) {
+		this.vjezds = vjezds;
+	}
+
+	public Set<ParkovaciMisto> getParkovaciMistos() {
+		return this.parkovaciMistos;
+	}
+
+	public void setParkovaciMistos(Set<ParkovaciMisto> parkovaciMistos) {
+		this.parkovaciMistos = parkovaciMistos;
 	}
 
 	public Long getIdZony() {
@@ -135,6 +174,24 @@ public class Zona extends TableBase implements java.io.Serializable {
 		return null;
 	}
 
+	public static Zona updateOrInsert(Long ZonaId, String ZonaName, JGeometry geoZony) {
+		if (selectById(ZonaId) == null) {
+			return insert(ZonaName, geoZony);
+		} else {
+			return update(ZonaId, ZonaName, geoZony);
+		}
+	}
+
+	public Zona update(String ZonaName, JGeometry geoZony) {
+		Zona z = update(idZony, ZonaName, geoZony);
+		return z;
+	}
+
+	public Zona update() {
+		Zona z = update(this.nazevZony, geoZony.getJGeometry());
+		return z;
+	}
+
 	public static Zona update(Long ZonaId, String ZonaName, JGeometry geoZony) {
 		log.info("Zona.update");
 		try {
@@ -169,6 +226,40 @@ public class Zona extends TableBase implements java.io.Serializable {
 			return false;
 		}
 		return true;
+	}
+
+	public static Zona selectObjectByGeometry(JGeometryType geometry) {
+		return selectObjectByGeometry(geometry.getJGeometry());
+	}
+
+	public static Zona selectObjectByGeometry(JGeometry geometry) {
+		try {
+			entityManager.getTransaction().begin();
+			Zona result = entityManager
+					.createQuery("from Zona WHERE SDO_RELATE(geo_zony, :geo, 'mask=anyinteract') = 'TRUE')", Zona.class)
+					.setParameter("geo", new JGeometryType(geometry)).getSingleResult();
+			entityManager.getTransaction().commit();
+			return result;
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static List<Zona> selectObjectsByGeometry(JGeometry geometry) {
+		try {
+			entityManager.getTransaction().begin();
+			List<Zona> result = entityManager
+					.createQuery("from Zona WHERE SDO_RELATE(geo_zony, :geo, 'mask=anyinteract') = 'TRUE')", Zona.class)
+					.setParameter("geo", new JGeometryType(geometry)).getResultList();
+			entityManager.getTransaction().commit();
+			return result;
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+			e.printStackTrace();
+		}
+		return Collections.emptyList();
 	}
 
 }

@@ -106,11 +106,11 @@ public class LoginForm extends JFrame {
 		JButton btnNewButton = new JButton("Log In");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TableBase.login(url.getText(), "xkrbec02", "hjdjob9b");
-				MainForm myMainForm = new MainForm(url.getText(), user.getText());
-				myMainForm.setVisible(true);
-				dispose();
-				/*if (TableBase.login(url.getText(), user.getText(), password.getText())) {
+				//TableBase.login(url.getText(), "xkrbec02", "hjdjob9b");
+				//MainForm myMainForm = new MainForm(url.getText(), user.getText());
+				//myMainForm.setVisible(true);
+				//dispose();
+				if (TableBase.login(url.getText(), user.getText(), password.getText())) {
 					MainForm myMainForm = new MainForm(url.getText(), user.getText());
 					myMainForm.setVisible(true);
 					dispose();
@@ -119,7 +119,7 @@ public class LoginForm extends JFrame {
 				} else {
 					user.setText("");
 					password.setText("");
-				}*/
+				}
 			}
 		});
 		contentPane.add(btnNewButton);

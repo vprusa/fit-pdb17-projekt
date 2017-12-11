@@ -13,6 +13,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Query;
 import javax.persistence.SequenceGenerator;
@@ -40,9 +42,9 @@ public class ParkovaciMisto extends TableBase implements java.io.Serializable {
 	private Long idMista;
 	@Column(name = "POZN")
 	private String pozn;
-	@Column(name = "GEO_MISTA")
-	@Type(type = "JGeometryType")
-	private JGeometryType geoMista;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "ZONA_ID", nullable = false)
+	private Zona zona;
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "parkovaciMisto")
 	private Set<Parkovani> parkovanis = new HashSet<Parkovani>(0);
 
@@ -53,10 +55,10 @@ public class ParkovaciMisto extends TableBase implements java.io.Serializable {
 		this.idMista = idMista;
 	}
 
-	public ParkovaciMisto(Long idMista, String pozn, JGeometryType geoMista, Set<Parkovani> parkovanis) {
+	public ParkovaciMisto(Long idMista, String pozn, Zona zona, Set<Parkovani> parkovanis) {
 		this.idMista = idMista;
 		this.pozn = pozn;
-		this.geoMista = geoMista;
+		this.zona = zona;
 		this.parkovanis = parkovanis;
 	}
 
@@ -76,12 +78,16 @@ public class ParkovaciMisto extends TableBase implements java.io.Serializable {
 		this.pozn = pozn;
 	}
 
-	public JGeometryType getGeoMista() {
-		return this.geoMista;
+	public JGeometry getJGeometry() {
+		return this.zona.getJGeoZony();
+	}
+	
+	public Zona getZona() {
+		return this.zona;
 	}
 
-	public void setGeoMista(JGeometryType geoMista) {
-		this.geoMista = geoMista;
+	public void setZona(Zona zona) {
+		this.zona = zona;
 	}
 
 	public Set<Parkovani> getParkovanis() {
@@ -92,15 +98,15 @@ public class ParkovaciMisto extends TableBase implements java.io.Serializable {
 		this.parkovanis = parkovanis;
 	}
 
-	public static ParkovaciMisto insert(String pozn, JGeometry geoMista, Set<Parkovani> parkovanis) {
-		// Long idMista, String pozn, JGeometryType geoMista, Set<Parkovani> parkovanis
+	public static ParkovaciMisto insert(String pozn, Zona zona, Set<Parkovani> parkovanis) {
+		// Long idMista, String pozn, Zona zona, Set<Parkovani> parkovanis
 
 		ParkovaciMisto ParkovaciMisto = new ParkovaciMisto();
 		try {
 			entityManager.getTransaction().begin();
 
 			ParkovaciMisto.setPozn(pozn);
-			ParkovaciMisto.setGeoMista(new JGeometryType(geoMista));
+			ParkovaciMisto.setZona(zona);
 			ParkovaciMisto.setParkovanis(parkovanis);
 
 			log.info("\n\n\nSave");
@@ -131,17 +137,17 @@ public class ParkovaciMisto extends TableBase implements java.io.Serializable {
 		return Collections.emptyList();
 	}
 
-	public static ParkovaciMisto update(Long ParkovaciMistoId, String pozn, JGeometryType geoMista,
-			Set<Parkovani> parkovanis) {
+	public static ParkovaciMisto update(Long ParkovaciMistoId, String pozn, Zona zona, Set<Parkovani> parkovanis) {
 		log.info("ParkovaciMisto.update");
 		try {
+			Zona.updateOrInsert(zona.getIdZony(), zona.getNazevZony(), zona.getJGeoZony());
 			entityManager.getTransaction().begin();
 			ParkovaciMisto ParkovaciMisto = (ParkovaciMisto) entityManager.find(ParkovaciMisto.class, ParkovaciMistoId);
 			if (ParkovaciMisto == null) {
 				return null;
 			}
 			ParkovaciMisto.setPozn(pozn);
-			ParkovaciMisto.setGeoMista(geoMista);
+			ParkovaciMisto.setZona(zona);
 			ParkovaciMisto.setParkovanis(parkovanis);
 			entityManager.getTransaction().commit();
 			log.info(ParkovaciMisto.getIdMista());
@@ -166,18 +172,39 @@ public class ParkovaciMisto extends TableBase implements java.io.Serializable {
 		}
 		return true;
 	}
-	
-	public static Long selectObjectByGeometry(JGeometryType geometry) {
+
+	public static ParkovaciMisto getByZona(Zona zona) {
 		try {
 			entityManager.getTransaction().begin();
-			List<ParkovaciMisto> result = entityManager.createQuery("from ParkovaciMisto WHERE SDO_RELATE(geoMista, :geo, 'mask=anyinteract') = 'TRUE')", ParkovaciMisto.class).setParameter("geo", geometry).getResultList();
+			@SuppressWarnings("unchecked")
+			ParkovaciMisto parkovaciMistos = (ParkovaciMisto) entityManager
+					.createQuery("from ParkovaciMisto where ZONA_ID = :id").setParameter("id", zona.getIdZony()).getSingleResult();
 			entityManager.getTransaction().commit();
-			return result.isEmpty() ? null : result.get(0).getIdMista();
+			return parkovaciMistos;
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+			//e.printStackTrace();
+		}
+		return null;
+	}
+	
+	
+/*
+	public static ParkovaciMisto selectObjectByGeometry(JGeometry geometry) {
+		try {
+			entityManager.getTransaction().begin();
+			Zona result = entityManager
+					.createQuery("from Zona WHERE SDO_RELATE(zona, :geo, 'mask=anyinteract') = 'TRUE')", Zona.class)
+					.setParameter("geo", geometry).getSingleResult();
+			ParkovaciMisto resultPM = ParkovaciMisto.selectById(result.getIdZony());
+			entityManager.getTransaction().commit();
+			// TODO: simplyfy - too complicated
+			return resultPM.getZona().getIdZony();
 		} catch (Exception e) {
 			entityManager.getTransaction().rollback();
 			e.printStackTrace();
 		}
 		return null;
-	}
+	}*/
 
 }
