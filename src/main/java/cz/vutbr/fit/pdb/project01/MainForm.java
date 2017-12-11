@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import cz.vutbr.fit.pdb.project.model.TableBase;
+import cz.vutbr.fit.pdb.project.tables.Vozidlo;
 
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -17,14 +18,22 @@ import java.awt.Dimension;
 import javax.swing.JTabbedPane;
 import javax.swing.JSplitPane;
 import java.awt.GridLayout;
+import java.awt.Image;
+
 import javax.swing.JLabel;
 import java.awt.FlowLayout;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import javax.swing.AbstractListModel;
 import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import java.awt.Component;
 import java.awt.Canvas;
@@ -35,10 +44,13 @@ import javax.swing.JTable;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.ActionEvent;
 import javax.swing.Box;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
 
 public class MainForm extends JFrame {
 
@@ -62,7 +74,7 @@ public class MainForm extends JFrame {
 	private JTextField deleteTo;
 	private JTable currentResidence;
 	private JTextField SPZ;
-
+	public Vozidlo myCar = null;
 	/**
 	 * Launch the application.
 	 */
@@ -161,8 +173,9 @@ public class MainForm extends JFrame {
 		multimedialniData.add(textPanel);
 		textPanel.setLayout(new BorderLayout(0, 0));
 		String[] originalList = originalListRefresh();
-		
 		JList<String> list = new JList<String>();
+		
+		
 		list.setVisibleRowCount(20);
 		list.setModel(new AbstractListModel() {
 			String[] values = originalList;
@@ -263,71 +276,92 @@ public class MainForm extends JFrame {
 		
 		Component horizontalStrut_3 = Box.createHorizontalStrut(20);
 		multimedialniData.add(horizontalStrut_3);
-
+		
 		JPanel picturePanel = new JPanel();
 		multimedialniData.add(picturePanel);
+		
 		picturePanel.setLayout(new BoxLayout(picturePanel, BoxLayout.Y_AXIS));
-
-		JPanel pictureItself = new JPanel();
-		pictureItself.setBackground(Color.WHITE);
-		picturePanel.add(pictureItself);
-		pictureItself.setLayout(new BoxLayout(pictureItself, BoxLayout.Y_AXIS));
 		
-		JPanel panel_2 = new JPanel();
-		pictureItself.add(panel_2);
-
-		JLabel SPZLabel = new JLabel();
-		panel_2.add(SPZLabel);
-		SPZLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		
-		JPanel picPanel = new JPanel();
-		picPanel.setMaximumSize(new Dimension(10000, 100));
-		pictureItself.add(picPanel);
-		
-		JButton btRotateLeft1 = new JButton("Rotovat vlevo");
-		picPanel.add(btRotateLeft1);
-		
-		JButton btRotateRight1 = new JButton("Rotovat vpravo");
-		picPanel.add(btRotateRight1);
-		
-		Component verticalStrut = Box.createVerticalStrut(20);
-		pictureItself.add(verticalStrut);
-		
-		JPanel panel_1 = new JPanel();
-		pictureItself.add(panel_1);
-		
-		JLabel CarLabel = new JLabel();
-		panel_1.add(CarLabel);
-		CarLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		
-		Component verticalStrut_1 = Box.createVerticalStrut(20);
-		pictureItself.add(verticalStrut_1);
-		
-				JPanel SPZDetail = new JPanel();
-				pictureItself.add(SPZDetail);
-				SPZDetail.setMaximumSize(new Dimension(10000,100));
+				JPanel pictureItself = new JPanel();
+				pictureItself.setBackground(Color.WHITE);
+				picturePanel.add(pictureItself);
+				pictureItself.setLayout(new BoxLayout(pictureItself, BoxLayout.Y_AXIS));
 				
-						JButton btRotateLeft = new JButton("Rotovat vlevo");
-						SPZDetail.add(btRotateLeft);
+				JPanel panel_2 = new JPanel();
+				pictureItself.add(panel_2);
+				
+						JLabel SPZLabel = new JLabel();
+						panel_2.add(SPZLabel);
+						SPZLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 						
-								JButton btnRotateRight = new JButton("Rotovat vpravo");
-								SPZDetail.add(btnRotateRight);
-		
-		JPanel panel = new JPanel();
-		panel.setMaximumSize(new Dimension(1000,100));
-		pictureItself.add(panel);
-		
-		JLabel lblNewLabel = new JLabel("SPZ:");
-		panel.add(lblNewLabel);
-		lblNewLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		
-		SPZ = new JTextField();
-		SPZ.setText("");
-		panel.add(SPZ);
-		SPZ.setColumns(20);
-		
-		JButton btnSave = new JButton("Uložit");
-		panel.add(btnSave);
+						JPanel picPanel = new JPanel();
+						picPanel.setMaximumSize(new Dimension(10000, 100));
+						pictureItself.add(picPanel);
+						
+						JButton btRotateLeft1 = new JButton("Rotovat vlevo");
+						btRotateLeft1.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								
+								Image src = iconToImage(SPZLabel.getIcon());
+								int w = src.getHeight(null);
+								int h = src.getWidth(null);
+								BufferedImage dest = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+								Graphics2D g2 = dest.createGraphics();
+								g2.rotate(Math.toRadians(270));
+								g2.drawImage(src, 0, 0, null);
+								g2.dispose();
+								SPZLabel.setIcon(new ImageIcon(dest));
+							}
+						});
+						picPanel.add(btRotateLeft1);
+						
+						JButton btRotateRight1 = new JButton("Rotovat vpravo");
+						picPanel.add(btRotateRight1);
+						
+						Component verticalStrut = Box.createVerticalStrut(20);
+						pictureItself.add(verticalStrut);
+						
+						JPanel panel_1 = new JPanel();
+						pictureItself.add(panel_1);
+						
+						JLabel CarLabel = new JLabel();
+						panel_1.add(CarLabel);
+						CarLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+						
+						Component verticalStrut_1 = Box.createVerticalStrut(20);
+						pictureItself.add(verticalStrut_1);
+						
+								JPanel SPZDetail = new JPanel();
+								pictureItself.add(SPZDetail);
+								SPZDetail.setMaximumSize(new Dimension(10000,100));
+								
+										JButton btRotateLeft = new JButton("Rotovat vlevo");
+										SPZDetail.add(btRotateLeft);
+										
+												JButton btnRotateRight = new JButton("Rotovat vpravo");
+												SPZDetail.add(btnRotateRight);
+												
+												JPanel panel = new JPanel();
+												panel.setMaximumSize(new Dimension(1000,100));
+												pictureItself.add(panel);
+												
+												JLabel lblNewLabel = new JLabel("SPZ:");
+												panel.add(lblNewLabel);
+												lblNewLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+												
+												SPZ = new JTextField();
+												SPZ.setEditable(false);
+												panel.add(SPZ);
+												SPZ.setColumns(20);
+												
+												JButton btnSave = new JButton("Uložit");
+												btnSave.addActionListener(new ActionListener() {
+													public void actionPerformed(ActionEvent e) {
+														myCar.update(myCar.getSpz(), iconToImage(CarLabel.getIcon()), iconToImage(SPZLabel.getIcon()), myCar.getPobyts());
+													}
+												});
+												btnSave.setEnabled(false);
+												panel.add(btnSave);
 
 		JPanel temporalniData = new JPanel();
 		mainPanel.addTab("Temporální data", null, temporalniData, null);
@@ -432,14 +466,57 @@ public class MainForm extends JFrame {
 		
 		JButton btnDeleteButton = new JButton("Smazat");
 		DeleteButtonsPanel.add(btnDeleteButton);
+		
+		list.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				myCar = Vozidlo.selectById(list.getSelectedValue());
+				SPZ.setText(myCar.getSpz());
+				SPZLabel.setIcon(new ImageIcon(myCar.getSpzFoto()));
+				CarLabel.setIcon(new ImageIcon(myCar.getFoto()));
+				btnSave.setEnabled(true);
+			}
+		});
 	}
 
 	private String[] originalListRefresh() {
-		return new String[] { "test", "test2", "test3", "test4", "test5", "test6", "test7", "test8",
-				"test9", "test10", "test11", "test12", "test13", "test14", "test15", "test16", "test17", "test18",
-				"test19", "test20", "test21", "test22", "test23", "test24", "test25", "test26", "test27", "test28",
-				"test29", "test30", "test31", "test32", "test33", "test34", "test35" };
-		
+		List<String> SPZlist = new ArrayList<String>();
+		List<Vozidlo> v2 = Vozidlo.list();
+		for (Vozidlo v : Vozidlo.list())
+		{
+			
+		SPZlist.add(v.getSpz());
+		}
+		String[] stockArr = new String[SPZlist.size()];
+		return SPZlist.toArray(stockArr);
 	}
-
+	
+	static Image iconToImage(Icon icon) {
+        if (icon instanceof ImageIcon) {
+            return ((ImageIcon)icon).getImage();
+        } else {
+            int w = icon.getIconWidth();
+            int h = icon.getIconHeight();
+            GraphicsEnvironment ge = 
+              GraphicsEnvironment.getLocalGraphicsEnvironment();
+            GraphicsDevice gd = ge.getDefaultScreenDevice();
+            GraphicsConfiguration gc = gd.getDefaultConfiguration();
+            BufferedImage image = gc.createCompatibleImage(w, h);
+            Graphics2D g = image.createGraphics();
+            icon.paintIcon(null, g, 0, 0);
+            g.dispose();
+            return image;
+        }
+    }
+	
+	private static BufferedImage toBufferedImage(Image src) {
+		int w = src.getWidth(null);
+		int h = src.getHeight(null);
+		int type = BufferedImage.TYPE_INT_RGB; // other options
+		BufferedImage dest = new BufferedImage(w, h, type);
+		Graphics2D g2 = dest.createGraphics();
+		g2.drawImage(src, 0, 0, null);
+		g2.dispose();
+		return dest;
+	}
+	
 }

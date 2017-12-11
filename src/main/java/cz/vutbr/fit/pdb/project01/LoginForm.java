@@ -79,7 +79,7 @@ public class LoginForm extends JFrame {
 		user = new JTextField();
 		userPanel.add(user);
 		user.setColumns(20);
-		user.setText("xkrbec02");
+		user.setText("xcerma34");
 		passwordPanel = new JPanel();
 		contentPane.add(passwordPanel);
 
@@ -89,7 +89,7 @@ public class LoginForm extends JFrame {
 		password = new JTextField();
 		passwordPanel.add(password);
 		password.setColumns(20);
-		password.setText("hjdjob9b");
+		password.setText("fhtkbv0o");
 
 		urlPanel = new JPanel();
 		contentPane.add(urlPanel);
