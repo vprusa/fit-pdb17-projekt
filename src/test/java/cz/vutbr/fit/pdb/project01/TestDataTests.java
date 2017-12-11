@@ -70,15 +70,13 @@ public class TestDataTests extends TestCase {
 	 * @throws IOException
 	 */
 	public void testZonaSelectByIdTableCRUD() throws IOException {
-		String testVjezdName = "testVjezdName";
-		String testVjezdName2 = "testVjezdName2";
 
 		int vjezdW = 20, vjezdH = 10;
 		int vyjezdW = vjezdW, vyjezdH = vjezdH;
 		int carW = 40, carH = 20;
-		
-		JGeometry geo = new JGeometry(10, 10, 10, 10, 1);
-		JGeometry geo2 = JGeometry.createCircle(0, 0, 10, 1);
+
+		int recordsCount = 5;
+
 		List<JGeometry> carList = new ArrayList<JGeometry>();// List();//Collections.emptyList();
 		// List<JGeometry> carList = Collections.emptyList();
 		int PaddingTop = 50;
@@ -101,8 +99,36 @@ public class TestDataTests extends TestCase {
 			PaddingTop = PaddingTop + lineHeight;
 		}
 
+		double middleX = 50;
+		double middleY = 30;
+		JGeometry vjezd1Geom = JGeometry
+				.createLinearPolygon(new double[] { middleX + 10, middleY + 5, middleX - 10, middleY + 5, middleX - 15,
+						middleY, middleX - 10, middleY - 5, middleX + 10, middleY - 5, middleX + 15, middleY }, 2, 0);
+
+		Vjezd vjezd1 = Vjezd.insert(Zona.insert("vjezd1", vjezd1Geom));
+
+		middleX = 200;
+		middleY = 30;
+		JGeometry vjezd2Geom = JGeometry
+				.createLinearPolygon(new double[] { middleX + 10, middleY + 5, middleX - 10, middleY + 5, middleX - 15,
+						middleY, middleX - 10, middleY - 5, middleX + 10, middleY - 5, middleX + 15, middleY }, 2, 0);
+
+		// JGeometry vjezd2Geom = JGeometry.createCircle(200, 30, 10, 0);
+		Vjezd vjezd2 = Vjezd.insert(Zona.insert("vjezd2", vjezd2Geom));
+
+		middleX = 350;
+		middleY = 30;
+		JGeometry vyjezd1Geom = JGeometry
+				.createLinearPolygon(new double[] { middleX + 10, middleY + 5, middleX - 10, middleY + 5, middleX - 15,
+						middleY, middleX - 10, middleY - 5, middleX + 10, middleY - 5, middleX + 15, middleY }, 2, 0);
+
+		// JGeometry vyjezd1Geom = JGeometry.createCircle(350, 30, 10, 0);
+		Vyjezd vyjezd1 = Vyjezd.insert(Zona.insert("vyjezd1", vyjezd1Geom));
+
+		List<ParkovaciMisto> parkovaciMistos = new ArrayList<ParkovaciMisto>();
 		carList.stream().forEach(i -> {
-			ParkovaciMisto.insert("Pm.", Zona.insert("pm", i), Collections.emptySet());
+			ParkovaciMisto parkovaciMisto = ParkovaciMisto.insert("pm", Zona.insert("pm", i), Collections.emptySet());
+			parkovaciMistos.add(parkovaciMisto);
 		});
 
 		String resourcesPath = "./";
@@ -110,15 +136,26 @@ public class TestDataTests extends TestCase {
 		Image image = ImageIO.read(pathToFile);
 
 		List<Vozidlo> vozidlos = new ArrayList<Vozidlo>();
-		
-		for (int y = 1; y < 5; y++) {
+
+		for (int y = 1; y < recordsCount; y++) {
 			Vozidlo vozidlo = Vozidlo.insert("tSpzU" + y, image, image, Collections.emptySet());
 			vozidlos.add(vozidlo);
 		}
-		
-		
 
-		// JGeometry car1 = JGeometry.createLinearPolygon({10,10, 40, 20}, 2, 0);
+		List<Pobyt> pobyts = new ArrayList<Pobyt>();
+
+		for (int y = 1; y < recordsCount; y++) {
+			Pobyt pobyt = Pobyt.insert(vjezd1, vozidlos.get(y - 1), vyjezd1, new Date(), new Date(),
+					Collections.emptySet());
+			pobyts.add(pobyt);
+		}
+
+		List<Parkovani> parkovanis = new ArrayList<Parkovani>();
+		for (int y = 1; y < recordsCount; y++) {
+			Parkovani parkovani = Parkovani.insert(parkovaciMistos.get(y - 1), pobyts.get(y - 1), new Date(),
+					new Date());
+			parkovanis.add(parkovani);
+		}
 
 	}
 

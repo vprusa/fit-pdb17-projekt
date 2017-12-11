@@ -329,7 +329,7 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		switch (selectedType) {
 		case parkPlace:
 			ParkovaciMisto parkPlace = objectsMap.get(selectedShape.getIdZony());
-			ParkovaciMisto.update(parkPlace.getIdMista(), parkPlace.getPozn(), parkPlace.getZona(), parkPlace.getParkovanis());
+			ParkovaciMisto.update(parkPlace.getIdMista(), parkPlace.getPozn(), parkPlace.getZona(),parkPlace.getParkovanis());
 			break;
 
 		case entrance:
