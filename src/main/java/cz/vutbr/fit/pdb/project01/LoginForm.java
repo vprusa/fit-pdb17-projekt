@@ -107,24 +107,12 @@ public class LoginForm extends JFrame {
 		JButton btnNewButton = new JButton("Log In");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-<<<<<<< HEAD
-				TableBase.login(url.getText(), user.getText(), password.getText());
+				if(TableBase.login(url.getText(), user.getText(), password.getText()))
+				{
 				MainForm myMainForm = new MainForm(url.getText(), user.getText());
 				myMainForm.setVisible(true);
 				dispose();
-				/*if (TableBase.login(url.getText(), user.getText(), password.getText())) {
-=======
-				//TableBase.login(url.getText(), "xkrbec02", "hjdjob9b");
-				//MainForm myMainForm = new MainForm(url.getText(), user.getText());
-				//myMainForm.setVisible(true);
-				//dispose();
-				if (TableBase.login(url.getText(), user.getText(), password.getText())) {
->>>>>>> e32faf528fafc8fc8d695874072fd0955097e34f
-					MainForm myMainForm = new MainForm(url.getText(), user.getText());
-					myMainForm.setVisible(true);
-					dispose();
-					// test - shoudl not fail
-					Zona.list();
+				
 				} else {
 					user.setText("");
 					password.setText("");
