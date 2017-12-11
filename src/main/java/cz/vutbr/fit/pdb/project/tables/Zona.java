@@ -120,6 +120,21 @@ public class Zona extends TableBase implements java.io.Serializable {
 		return Collections.emptyList();
 	}
 
+	public static Zona selectById(Long id) {
+		try {
+			entityManager.getTransaction().begin();
+			@SuppressWarnings("unchecked")
+			Zona Zona = (Zona) entityManager.createQuery("from Zona where ID_ZONY=:id").setParameter("id", id)
+					.getSingleResult();
+			entityManager.getTransaction().commit();
+			return Zona;
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	public static Zona update(Long ZonaId, String ZonaName, JGeometry geoZony) {
 		log.info("Zona.update");
 		try {

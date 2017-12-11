@@ -23,6 +23,7 @@ import cz.vutbr.fit.pdb.project.tables.Vjezd;
 import cz.vutbr.fit.pdb.project.tables.Parkovani;
 import cz.vutbr.fit.pdb.project.tables.Vozidlo;
 import cz.vutbr.fit.pdb.project.tables.Vyjezd;
+import cz.vutbr.fit.pdb.project.tables.Zona;
 import cz.vutbr.fit.pdb.project.tables.Pobyt;
 import cz.vutbr.fit.pdb.project.tables.Pobyt;
 import junit.framework.Test;
@@ -66,56 +67,13 @@ public class TempTests extends TestCase {
 	/**
 	 * @throws IOException
 	 */
-	public void testParkovaniTableCRUD() throws IOException {
-		String testParkovaniName = "testParkovaniName";
-		String testParkovaniName2 = "testParkovaniName2";
-		Parkovani.list();
-		log.info("listed\n\n");
-
+	public void testZonaSelectByIdTableCRUD() throws IOException {
 		JGeometry geo = new JGeometry(0, 0, 10, 10, 1);
-		JGeometry geo2 = JGeometry.createCircle(20, 20, 10, 1);
-		JGeometry geo3 = new JGeometry(35, 35, 5, 10, 1);
 
-		ParkovaciMisto parkovaciMisto = ParkovaciMisto.insert("wasted time", geo3, Collections.emptySet());
-
-		String resourcesPath = "./";
-		File pathToFile = new File(resourcesPath + "/resources/Hibernate_logo_a.png");
-		Image image = ImageIO.read(pathToFile);
-
-		Vozidlo vozidlo = Vozidlo.insert("tSpzU", image, image, Collections.emptySet());
-		Vjezd vjezd = Vjezd.insert(geo);
-		Vyjezd vyjezd = Vyjezd.insert(geo2);
-		Date vjezd_1 = new Date();
-		Date vyjezd_1 = new Date();
-		Set<Parkovani> parkovanis = Collections.emptySet();
-
-		Pobyt pobyt = Pobyt.insert(vjezd, vozidlo, vyjezd, vjezd_1, vyjezd_1, parkovanis);
-		Date zacatek = new Date();
-		Date konec = new Date();
-		Date konec2 = new Date(); // updating
-
-		Parkovani newParkovani = Parkovani.insert(parkovaciMisto, pobyt, zacatek, konec);
-		assertTrue("New Parkovani with name " + testParkovaniName + " does not exists",
-				Parkovani.list().contains(newParkovani));
-		Parkovani newParkovani2 = Parkovani.update(newParkovani.getIdParkovani(), parkovaciMisto, pobyt, zacatek,
-				konec2);
-		assertTrue("New Parkovani with name " + testParkovaniName2 + " should not be null but is",
-				newParkovani2 != null);
-		assertTrue(
-				"New Parkovani with original name " + testParkovaniName + " should be updatable with new name "
-						+ testParkovaniName2 + " but is not",
-				newParkovani2.getIdParkovani().equals(newParkovani.getIdParkovani()));
-		assertTrue("New Parkovani with original name " + testParkovaniName + " should be deletable but is not",
-				Parkovani.delete(newParkovani2.getIdParkovani()));
-		assertTrue("New Parkovani with name " + testParkovaniName2 + " should be deleted but is not",
-				!Parkovani.list().contains(newParkovani2));
-
-		// clearing
-		assertTrue("Old pobyt with id " + pobyt.getIdPobyt() + "should be removable", Pobyt.delete(pobyt.getIdPobyt()));
-		assertTrue("Old vjezd with id " + vjezd.getIdVjezd() + "should be removable", Vjezd.delete(vjezd.getIdVjezd()));
-		assertTrue("Old vyjezd with id " + vyjezd.getIdVyjezd() + "should be removable",
-				Vyjezd.delete(vyjezd.getIdVyjezd()));
-		assertTrue("Old vozidlo with id " + vozidlo.getSpz() + "should be removable", Vozidlo.delete(vozidlo.getSpz()));
+		Zona newZona = Zona.insert("testName", geo);
+		Zona selectedZona = Zona.selectById(newZona.getIdZony());
+		assertTrue("New zona with name " + newZona.getNazevZony() + " must equals to selected zona with name "
+				+ selectedZona.getNazevZony(), selectedZona.equals(newZona));
 
 	}
 
