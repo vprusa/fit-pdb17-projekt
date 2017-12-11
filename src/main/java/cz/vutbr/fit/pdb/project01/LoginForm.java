@@ -79,7 +79,7 @@ public class LoginForm extends JFrame {
 		user = new JTextField();
 		userPanel.add(user);
 		user.setColumns(20);
-
+		user.setText("xkrbec02");
 		passwordPanel = new JPanel();
 		contentPane.add(passwordPanel);
 
@@ -89,6 +89,7 @@ public class LoginForm extends JFrame {
 		password = new JTextField();
 		passwordPanel.add(password);
 		password.setColumns(20);
+		password.setText("hjdjob9b");
 
 		urlPanel = new JPanel();
 		contentPane.add(urlPanel);
@@ -106,7 +107,7 @@ public class LoginForm extends JFrame {
 		JButton btnNewButton = new JButton("Log In");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TableBase.login(url.getText(), "xkrbec02", "hjdjob9b");
+				TableBase.login(url.getText(), user.getText(), password.getText());
 				MainForm myMainForm = new MainForm(url.getText(), user.getText());
 				myMainForm.setVisible(true);
 				dispose();
