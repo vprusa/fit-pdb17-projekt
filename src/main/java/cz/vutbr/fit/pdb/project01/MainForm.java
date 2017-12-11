@@ -7,7 +7,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import cz.vutbr.fit.pdb.project.model.PobytModel;
 import cz.vutbr.fit.pdb.project.model.TableBase;
+import cz.vutbr.fit.pdb.project.tables.Pobyt;
 import cz.vutbr.fit.pdb.project.tables.Vozidlo;
 
 import javax.swing.JTextField;
@@ -50,6 +52,8 @@ import java.util.List;
 import java.awt.event.ActionEvent;
 import javax.swing.Box;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
 import javax.swing.event.ListSelectionEvent;
 
 public class MainForm extends JFrame {
@@ -75,6 +79,8 @@ public class MainForm extends JFrame {
 	private JTable currentResidence;
 	private JTextField SPZ;
 	public Vozidlo myCar = null;
+	private JTextField SPZpath;
+	private JTextField PhotoPath;
 	/**
 	 * Launch the application.
 	 */
@@ -295,7 +301,7 @@ public class MainForm extends JFrame {
 						SPZLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 						
 						JPanel picPanel = new JPanel();
-						picPanel.setMaximumSize(new Dimension(10000, 100));
+						//picPanel.setMaximumSize(new Dimension(10000, 300));
 						pictureItself.add(picPanel);
 						
 						JButton btRotateLeft1 = new JButton("Rotovat vlevo");
@@ -318,6 +324,20 @@ public class MainForm extends JFrame {
 						JButton btRotateRight1 = new JButton("Rotovat vpravo");
 						picPanel.add(btRotateRight1);
 						
+						JPanel panel_4 = new JPanel();
+						picPanel.add(panel_4);
+						
+						JLabel label = new JLabel("Cesta:");
+						panel_4.add(label);
+						
+						PhotoPath = new JTextField();
+						PhotoPath.setText("");
+						PhotoPath.setColumns(30);
+						panel_4.add(PhotoPath);
+						
+						JButton btnPhotoLoad = new JButton("Načíst");
+						panel_4.add(btnPhotoLoad);
+						
 						Component verticalStrut = Box.createVerticalStrut(20);
 						pictureItself.add(verticalStrut);
 						
@@ -333,13 +353,27 @@ public class MainForm extends JFrame {
 						
 								JPanel SPZDetail = new JPanel();
 								pictureItself.add(SPZDetail);
-								SPZDetail.setMaximumSize(new Dimension(10000,100));
+								//SPZDetail.setMaximumSize(new Dimension(10000,300));
 								
 										JButton btRotateLeft = new JButton("Rotovat vlevo");
 										SPZDetail.add(btRotateLeft);
 										
 												JButton btnRotateRight = new JButton("Rotovat vpravo");
 												SPZDetail.add(btnRotateRight);
+												
+												JPanel panel_3 = new JPanel();
+												SPZDetail.add(panel_3);
+												
+												JLabel lblNewLabel_1 = new JLabel("Cesta:");
+												panel_3.add(lblNewLabel_1);
+												
+												SPZpath = new JTextField();
+												SPZpath.setText("");
+												panel_3.add(SPZpath);
+												SPZpath.setColumns(30);
+												
+												JButton btnSPZLoad = new JButton("Načíst");
+												panel_3.add(btnSPZLoad);
 												
 												JPanel panel = new JPanel();
 												panel.setMaximumSize(new Dimension(1000,100));
@@ -467,6 +501,14 @@ public class MainForm extends JFrame {
 		JButton btnDeleteButton = new JButton("Smazat");
 		DeleteButtonsPanel.add(btnDeleteButton);
 		
+		JButton btnTempRefresh = new JButton("Obnovit");
+		btnTempRefresh.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				RefreshTemp();
+			}
+		});
+		DeleteButtonsPanel.add(btnTempRefresh);
+		
 		list.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				myCar = Vozidlo.selectById(list.getSelectedValue());
@@ -476,6 +518,16 @@ public class MainForm extends JFrame {
 				btnSave.setEnabled(true);
 			}
 		});
+	}
+
+	protected void RefreshTemp() {
+			List<Pobyt> pobyty = Pobyt.getCurrentResidence();
+			List<String[]> arrayList = new ArrayList();#
+			for (Pobyt pob : pobyty)
+			{
+				
+			}
+			currentResidence.setModel(new PobytModel(pobyty.ar));
 	}
 
 	private String[] originalListRefresh() {
