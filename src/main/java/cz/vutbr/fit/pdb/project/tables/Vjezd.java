@@ -139,6 +139,7 @@ public class Vjezd extends TableBase implements java.io.Serializable {
 	public static Vjezd update(Long VjezdId, Zona zona) {
 		log.info("Vjezd.update");
 		try {
+			Zona.updateOrInsert(zona.getIdZony(), zona.getNazevZony(), zona.getJGeoZony());
 			entityManager.getTransaction().begin();
 			Vjezd Vjezd = (Vjezd) entityManager.find(Vjezd.class, VjezdId);
 			if (Vjezd == null) {

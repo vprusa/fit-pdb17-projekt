@@ -141,6 +141,7 @@ public class Vyjezd extends TableBase implements java.io.Serializable {
 	public static Vyjezd update(Long VyjezdId, Zona zona) {
 		log.info("Vyjezd.update");
 		try {
+			Zona.updateOrInsert(zona.getIdZony(), zona.getNazevZony(), zona.getJGeoZony());
 			entityManager.getTransaction().begin();
 			Vyjezd Vyjezd = (Vyjezd) entityManager.find(Vyjezd.class, VyjezdId);
 			if (Vyjezd == null) {
