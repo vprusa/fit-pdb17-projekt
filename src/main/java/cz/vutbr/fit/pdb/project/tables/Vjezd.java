@@ -68,6 +68,10 @@ public class Vjezd extends TableBase implements java.io.Serializable {
 		this.idVjezd = idVjezd;
 	}
 
+	public JGeometry getJGeometry() {
+		return this.zona.getJGeoZony();
+	}
+
 	public Zona getZona() {
 		return this.zona;
 	}
@@ -96,6 +100,21 @@ public class Vjezd extends TableBase implements java.io.Serializable {
 			e.printStackTrace();
 		}
 		return Vjezd;
+	}
+	
+	public static Vjezd getByZona(Zona zona) {
+		try {
+			entityManager.getTransaction().begin();
+			@SuppressWarnings("unchecked")
+			Vjezd parkovaciMistos = (Vjezd) entityManager
+					.createQuery("from Vjezd where ZONA_ID = :id").setParameter("id", zona.getIdZony()).getSingleResult();
+			entityManager.getTransaction().commit();
+			return parkovaciMistos;
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+		//	e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static List<Vjezd> list() {

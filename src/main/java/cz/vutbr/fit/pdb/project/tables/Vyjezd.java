@@ -69,6 +69,10 @@ public class Vyjezd extends TableBase implements java.io.Serializable {
 		this.idVyjezd = idVyjezd;
 	}
 
+	public JGeometry getJGeometry() {
+		return this.zona.getJGeoZony();
+	}
+
 	public Zona getZona() {
 		return this.zona;
 	}
@@ -100,6 +104,21 @@ public class Vyjezd extends TableBase implements java.io.Serializable {
 		return Vyjezd;
 	}
 
+	public static Vyjezd getByZona(Zona zona) {
+		try {
+			entityManager.getTransaction().begin();
+			@SuppressWarnings("unchecked")
+			Vyjezd parkovaciMistos = (Vyjezd) entityManager.createQuery("from Vyjezd where ZONA_ID = :id")
+					.setParameter("id", zona.getIdZony()).getSingleResult();
+			entityManager.getTransaction().commit();
+			return parkovaciMistos;
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+		//	e.printStackTrace();
+		}
+		return null;
+	}
+
 	public static List<Vyjezd> list() {
 		try {
 			entityManager.getTransaction().begin();
@@ -108,7 +127,7 @@ public class Vyjezd extends TableBase implements java.io.Serializable {
 			for (Iterator<Vyjezd> iterator = Vyjezds.iterator(); iterator.hasNext();) {
 				Vyjezd Vyjezd = (Vyjezd) iterator.next();
 				System.out.println(Vyjezd.getIdVyjezd());
-				//System.out.println(Vyjezd.getZona().getGeoZony().getJGeometry().toGeoJson());
+				// System.out.println(Vyjezd.getZona().getGeoZony().getJGeometry().toGeoJson());
 			}
 			entityManager.getTransaction().commit();
 			return Vyjezds;
@@ -127,11 +146,11 @@ public class Vyjezd extends TableBase implements java.io.Serializable {
 			if (Vyjezd == null) {
 				return null;
 			}
-			//Vyjezd.setGeoVyjezd(new JGeometryType(geoVyjezd));
-			Vyjezd.setZona(zona);//(new JGeometryType(geoVyjezd));
+			// Vyjezd.setGeoVyjezd(new JGeometryType(geoVyjezd));
+			Vyjezd.setZona(zona);// (new JGeometryType(geoVyjezd));
 			entityManager.getTransaction().commit();
 			log.info(Vyjezd.getIdVyjezd());
-			//log.info(Vyjezd.getGeoVyjezd());
+			// log.info(Vyjezd.getGeoVyjezd());
 			return Vyjezd;
 		} catch (Exception e) {
 			entityManager.getTransaction().rollback();
@@ -153,5 +172,5 @@ public class Vyjezd extends TableBase implements java.io.Serializable {
 		}
 		return true;
 	}
-	
+
 }

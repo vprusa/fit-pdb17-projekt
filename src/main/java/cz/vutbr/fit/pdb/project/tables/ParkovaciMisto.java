@@ -78,6 +78,10 @@ public class ParkovaciMisto extends TableBase implements java.io.Serializable {
 		this.pozn = pozn;
 	}
 
+	public JGeometry getJGeometry() {
+		return this.zona.getJGeoZony();
+	}
+	
 	public Zona getZona() {
 		return this.zona;
 	}
@@ -136,6 +140,7 @@ public class ParkovaciMisto extends TableBase implements java.io.Serializable {
 	public static ParkovaciMisto update(Long ParkovaciMistoId, String pozn, Zona zona, Set<Parkovani> parkovanis) {
 		log.info("ParkovaciMisto.update");
 		try {
+			Zona.updateOrInsert(zona.getIdZony(), zona.getNazevZony(), zona.getJGeoZony());
 			entityManager.getTransaction().begin();
 			ParkovaciMisto ParkovaciMisto = (ParkovaciMisto) entityManager.find(ParkovaciMisto.class, ParkovaciMistoId);
 			if (ParkovaciMisto == null) {
@@ -168,22 +173,24 @@ public class ParkovaciMisto extends TableBase implements java.io.Serializable {
 		return true;
 	}
 
-	public static ParkovaciMisto selectById(Long id) {
+	public static ParkovaciMisto getByZona(Zona zona) {
 		try {
 			entityManager.getTransaction().begin();
 			@SuppressWarnings("unchecked")
 			ParkovaciMisto parkovaciMistos = (ParkovaciMisto) entityManager
-					.createQuery("from ParkovaciMisto where ID_MISTA = :id").setParameter("id", id).getSingleResult();
+					.createQuery("from ParkovaciMisto where ZONA_ID = :id").setParameter("id", zona.getIdZony()).getSingleResult();
 			entityManager.getTransaction().commit();
 			return parkovaciMistos;
 		} catch (Exception e) {
 			entityManager.getTransaction().rollback();
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return null;
 	}
-
-	public static Long selectObjectByGeometry(JGeometry geometry) {
+	
+	
+/*
+	public static ParkovaciMisto selectObjectByGeometry(JGeometry geometry) {
 		try {
 			entityManager.getTransaction().begin();
 			Zona result = entityManager
@@ -198,6 +205,6 @@ public class ParkovaciMisto extends TableBase implements java.io.Serializable {
 			e.printStackTrace();
 		}
 		return null;
-	}
+	}*/
 
 }

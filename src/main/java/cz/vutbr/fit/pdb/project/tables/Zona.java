@@ -174,6 +174,24 @@ public class Zona extends TableBase implements java.io.Serializable {
 		return null;
 	}
 
+	public static Zona updateOrInsert(Long ZonaId, String ZonaName, JGeometry geoZony) {
+		if (selectById(ZonaId) == null) {
+			return insert(ZonaName, geoZony);
+		} else {
+			return update(ZonaId, ZonaName, geoZony);
+		}
+	}
+
+	public Zona update(String ZonaName, JGeometry geoZony) {
+		Zona z = update(idZony, ZonaName, geoZony);
+		return z;
+	}
+
+	public Zona update() {
+		Zona z = update(this.nazevZony, geoZony.getJGeometry());
+		return z;
+	}
+
 	public static Zona update(Long ZonaId, String ZonaName, JGeometry geoZony) {
 		log.info("Zona.update");
 		try {
@@ -210,19 +228,38 @@ public class Zona extends TableBase implements java.io.Serializable {
 		return true;
 	}
 
-	public static Long selectObjectByGeometry(JGeometryType geometry) {
+	public static Zona selectObjectByGeometry(JGeometryType geometry) {
+		return selectObjectByGeometry(geometry.getJGeometry());
+	}
+
+	public static Zona selectObjectByGeometry(JGeometry geometry) {
 		try {
 			entityManager.getTransaction().begin();
-			List<Zona> result = entityManager
+			Zona result = entityManager
 					.createQuery("from Zona WHERE SDO_RELATE(geo_zony, :geo, 'mask=anyinteract') = 'TRUE')", Zona.class)
-					.setParameter("geo", geometry).getResultList();
+					.setParameter("geo", new JGeometryType(geometry)).getSingleResult();
 			entityManager.getTransaction().commit();
-			return result.isEmpty() ? null : result.get(0).getIdZony();
+			return result;
 		} catch (Exception e) {
 			entityManager.getTransaction().rollback();
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static List<Zona> selectObjectsByGeometry(JGeometry geometry) {
+		try {
+			entityManager.getTransaction().begin();
+			List<Zona> result = entityManager
+					.createQuery("from Zona WHERE SDO_RELATE(geo_zony, :geo, 'mask=anyinteract') = 'TRUE')", Zona.class)
+					.setParameter("geo", new JGeometryType(geometry)).getResultList();
+			entityManager.getTransaction().commit();
+			return result;
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+			e.printStackTrace();
+		}
+		return Collections.emptyList();
 	}
 
 }
