@@ -13,6 +13,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -37,11 +39,11 @@ public class Vjezd extends TableBase implements java.io.Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vjezd_seq")
 	@SequenceGenerator(name = "vjezd_seq", sequenceName = "vjezd_seq", allocationSize = 1, initialValue = 1)
 	private Long idVjezd;
-	
-	@Column(name = "GEO_VJEZD")
-	@Type(type = "JGeometryType")
-	private JGeometryType geoVjezd;
-	
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "ZONA_ID", nullable = false)
+	private Zona zona;
+
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "vjezd")
 	private Set<Pobyt> pobyts = new HashSet<Pobyt>(0);
 
@@ -52,9 +54,9 @@ public class Vjezd extends TableBase implements java.io.Serializable {
 		this.idVjezd = idVjezd;
 	}
 
-	public Vjezd(Long idVjezd, JGeometryType geoVjezd, Set<Pobyt> pobyts) {
+	public Vjezd(Long idVjezd, Zona zona, Set<Pobyt> pobyts) {
 		this.idVjezd = idVjezd;
-		this.geoVjezd = geoVjezd;
+		this.zona = zona;
 		this.pobyts = pobyts;
 	}
 
@@ -66,12 +68,12 @@ public class Vjezd extends TableBase implements java.io.Serializable {
 		this.idVjezd = idVjezd;
 	}
 
-	public JGeometryType getGeoVjezd() {
-		return this.geoVjezd;
+	public Zona getZona() {
+		return this.zona;
 	}
 
-	public void setGeoVjezd(JGeometryType geoVjezd) {
-		this.geoVjezd = geoVjezd;
+	public void setZona(Zona zona) {
+		this.zona = zona;
 	}
 
 	public Set<Pobyt> getPobyts() {
@@ -82,11 +84,11 @@ public class Vjezd extends TableBase implements java.io.Serializable {
 		this.pobyts = pobyts;
 	}
 
-	public static Vjezd insert(JGeometry geoVjezd) {
+	public static Vjezd insert(Zona zona) {
 		Vjezd Vjezd = new Vjezd();
 		try {
 			entityManager.getTransaction().begin();
-			Vjezd.setGeoVjezd(new JGeometryType(geoVjezd));
+			Vjezd.setZona(zona);
 			Vjezd = entityManager.merge(Vjezd);
 			entityManager.getTransaction().commit();
 		} catch (Exception e) {
@@ -104,7 +106,7 @@ public class Vjezd extends TableBase implements java.io.Serializable {
 			for (Iterator<Vjezd> iterator = Vjezds.iterator(); iterator.hasNext();) {
 				Vjezd Vjezd = (Vjezd) iterator.next();
 				System.out.println(Vjezd.getIdVjezd());
-				System.out.println(Vjezd.getGeoVjezd().getJGeometry().toGeoJson());
+				// System.out.println(Vjezd.getGeoVjezd().getJGeometry().toGeoJson());
 			}
 			entityManager.getTransaction().commit();
 			return Vjezds;
@@ -115,7 +117,7 @@ public class Vjezd extends TableBase implements java.io.Serializable {
 		return Collections.emptyList();
 	}
 
-	public static Vjezd update(Long VjezdId, JGeometry geoVjezd) {
+	public static Vjezd update(Long VjezdId, Zona zona) {
 		log.info("Vjezd.update");
 		try {
 			entityManager.getTransaction().begin();
@@ -123,10 +125,10 @@ public class Vjezd extends TableBase implements java.io.Serializable {
 			if (Vjezd == null) {
 				return null;
 			}
-			Vjezd.setGeoVjezd(new JGeometryType(geoVjezd));
+			Vjezd.setZona(zona);
 			entityManager.getTransaction().commit();
 			log.info(Vjezd.getIdVjezd());
-			log.info(Vjezd.getGeoVjezd());
+			// log.info(Vjezd.getGeoVjezd());
 			return Vjezd;
 		} catch (Exception e) {
 			entityManager.getTransaction().rollback();
@@ -147,19 +149,6 @@ public class Vjezd extends TableBase implements java.io.Serializable {
 			return false;
 		}
 		return true;
-	}
-	
-	public static Long selectObjectByGeometry(JGeometryType geometry) {
-		try {
-			entityManager.getTransaction().begin();
-			List<Vjezd> result = entityManager.createQuery("from Vjezd WHERE SDO_RELATE(geoVjezd, :geo, 'mask=anyinteract') = 'TRUE')", Vjezd.class).setParameter("geo", geometry).getResultList();
-			entityManager.getTransaction().commit();
-			return result.isEmpty() ? null : result.get(0).getIdVjezd();
-		} catch (Exception e) {
-			entityManager.getTransaction().rollback();
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 }

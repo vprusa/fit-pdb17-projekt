@@ -192,19 +192,19 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		Long idx = null;
 		
 		JGeometry geometry = JGeometry.createLinearPolygon(new double[]{p1x, p1y, p2x, p2y, p3x, p3y}, 2, 0);
-		idx = ParkovaciMisto.selectObjectByGeometry(new JGeometryType(geometry));
+		idx = ParkovaciMisto.selectObjectByGeometry(geometry);
 		if (idx != null) {
 			selectedType = SpatialType.parkPlace;
 			return idx;
 		} else {
 			// seach entrance/exit (less priority)
-			idx = Vjezd.selectObjectByGeometry(new JGeometryType(geometry));
+			idx = Vjezd.selectObjectByGeometry(geometry);
 			if (idx != null) {
 				selectedType = SpatialType.entrance;
 				return idx;
 			}
 			
-			idx = Vyjezd.selectObjectByGeometry(new JGeometryType(geometry));
+			idx = Vyjezd.selectObjectByGeometry(geometry);
 			if (idx != null) {
 				selectedType = SpatialType.exit;
 				return idx;
