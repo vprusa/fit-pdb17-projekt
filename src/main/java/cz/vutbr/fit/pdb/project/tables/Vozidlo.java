@@ -1,7 +1,9 @@
 package cz.vutbr.fit.pdb.project.tables;
 // Generated Nov 28, 2017 5:54:05 PM by Hibernate Tools 4.3.5.Final
 
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
@@ -182,4 +184,18 @@ public class Vozidlo extends TableBase {
 		return null;
 	}
 	
+	public static Vozidlo RotateSPZ(String spz, long angle) {
+		try {
+			entityManager.getTransaction().begin();
+			@SuppressWarnings("unchecked")
+			Vozidlo v = (Vozidlo) entityManager.createQuery("from Vozidlo where SPZ=:spz").setParameter("spz", spz)
+					.getSingleResult();
+			entityManager.getTransaction().commit();
+			return v;
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

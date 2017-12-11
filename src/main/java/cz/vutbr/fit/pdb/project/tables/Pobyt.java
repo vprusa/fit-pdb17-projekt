@@ -1,6 +1,9 @@
 package cz.vutbr.fit.pdb.project.tables;
 // Generated Dec 10, 2017 4:55:13 PM by Hibernate Tools 4.3.5.Final
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -210,4 +213,20 @@ public class Pobyt extends TableBase implements java.io.Serializable {
 		return true;
 	}
 
+	public static List<Pobyt> getCurrentResidence() {
+		try {
+			entityManager.getTransaction().begin();
+			@SuppressWarnings("unchecked")
+			java.sql.Connection connection = entityManager.unwrap(java.sql.Connection.class);
+			
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd 00:00:00");
+			Date date = new Date();
+			
+			return entityManager.createQuery("from Pobyt where VYJEZ IS NULL OR VYJEZD >=:datum").setParameter("datum", dateFormat.format(date)).getResultList();
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+			e.printStackTrace();
+			return null;
+		}
+	}
 }
