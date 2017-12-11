@@ -167,4 +167,19 @@ public class Vozidlo extends TableBase {
 		return true;
 	}
 
+	public static Vozidlo selectById(String spz) {
+		try {
+			entityManager.getTransaction().begin();
+			@SuppressWarnings("unchecked")
+			Vozidlo v = (Vozidlo) entityManager.createQuery("from Vozidlo where SPZ=:spz").setParameter("spz", spz)
+					.getSingleResult();
+			entityManager.getTransaction().commit();
+			return v;
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 }
