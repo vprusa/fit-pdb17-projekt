@@ -74,15 +74,19 @@ public class TableTests extends TestCase {
 		JGeometry geo2 = JGeometry.createCircle(20, 20, 10, 1);
 		JGeometry geo3 = new JGeometry(35, 35, 5, 10, 1);
 
-		ParkovaciMisto parkovaciMisto = ParkovaciMisto.insert("wasted time", geo3, Collections.emptySet());
+		Zona zonaGeo = Zona.insert("", geo);
+		Zona zonaGeo2 = Zona.insert("", geo2);
+		Zona zonaGeo3 = Zona.insert("", geo3);
+
+		ParkovaciMisto parkovaciMisto = ParkovaciMisto.insert("wasted time", zonaGeo3, Collections.emptySet());
 
 		String resourcesPath = "./";
 		File pathToFile = new File(resourcesPath + "/resources/Hibernate_logo_a.png");
 		Image image = ImageIO.read(pathToFile);
 
 		Vozidlo vozidlo = Vozidlo.insert("tSpzU", image, image, Collections.emptySet());
-		Vjezd vjezd = Vjezd.insert(geo);
-		Vyjezd vyjezd = Vyjezd.insert(geo2);
+		Vjezd vjezd = Vjezd.insert(zonaGeo);
+		Vyjezd vyjezd = Vyjezd.insert(zonaGeo2);
 		Date vjezd_1 = new Date();
 		Date vyjezd_1 = new Date();
 		Set<Parkovani> parkovanis = Collections.emptySet();
@@ -115,6 +119,9 @@ public class TableTests extends TestCase {
 				Vyjezd.delete(vyjezd.getIdVyjezd()));
 		assertTrue("Old vozidlo with id " + vozidlo.getSpz() + "should be removable", Vozidlo.delete(vozidlo.getSpz()));
 
+		Zona.delete(zonaGeo.getIdZony());
+		Zona.delete(zonaGeo2.getIdZony());
+		Zona.delete(zonaGeo3.getIdZony());
 	}
 
 	/**
@@ -127,13 +134,16 @@ public class TableTests extends TestCase {
 		JGeometry geo = new JGeometry(0, 0, 10, 10, 1);
 		JGeometry geo2 = JGeometry.createCircle(20, 20, 10, 1);
 
+		Zona zonaGeo = Zona.insert("", geo);
+		Zona zonaGeo2 = Zona.insert("", geo2);
+
 		String resourcesPath = "./";
 		File pathToFile = new File(resourcesPath + "/resources/Hibernate_logo_a.png");
 		Image image = ImageIO.read(pathToFile);
 
 		Vozidlo vozidlo = Vozidlo.insert("tSpzU2", image, image, Collections.emptySet());
-		Vjezd vjezd = Vjezd.insert(geo);
-		Vyjezd vyjezd = Vyjezd.insert(geo2);
+		Vjezd vjezd = Vjezd.insert(zonaGeo);
+		Vyjezd vyjezd = Vyjezd.insert(zonaGeo2);
 		Date vjezd_1 = new Date();
 		Date vyjezd_1 = new Date();
 		Date vyjezd_1_2 = new Date(); // updating
@@ -159,6 +169,8 @@ public class TableTests extends TestCase {
 				Vyjezd.delete(vyjezd.getIdVyjezd()));
 		assertTrue("Old vozidlo with id " + vozidlo.getSpz() + "should be removable", Vozidlo.delete(vozidlo.getSpz()));
 
+		Zona.delete(zonaGeo.getIdZony());
+		Zona.delete(zonaGeo2.getIdZony());
 	}
 
 	/**
@@ -172,9 +184,12 @@ public class TableTests extends TestCase {
 		JGeometry geo = new JGeometry(0, 0, 10, 10, 1);
 		JGeometry geo2 = JGeometry.createCircle(0, 0, 10, 1);
 
-		Vjezd newVjezd = Vjezd.insert(geo);
+		Zona zonaGeo = Zona.insert("", geo);
+		Zona zonaGeo2 = Zona.insert("", geo2);
+
+		Vjezd newVjezd = Vjezd.insert(zonaGeo);
 		assertTrue("New Vjezd with name " + testVjezdName + " does not exists", Vjezd.list().contains(newVjezd));
-		Vjezd newVjezd2 = Vjezd.update(newVjezd.getIdVjezd(), geo2);
+		Vjezd newVjezd2 = Vjezd.update(newVjezd.getIdVjezd(), zonaGeo2);
 		assertTrue("New Vjezd with name " + testVjezdName2 + " should not be null but is", newVjezd2 != null);
 		assertTrue("New Vjezd with original name " + testVjezdName + " should be updatable with new name "
 				+ testVjezdName2 + " but is not", newVjezd2.getIdVjezd().equals(newVjezd.getIdVjezd()));
@@ -182,6 +197,9 @@ public class TableTests extends TestCase {
 				Vjezd.delete(newVjezd2.getIdVjezd()));
 		assertTrue("New Vjezd with name " + testVjezdName2 + " should be deleted but is not",
 				!Vjezd.list().contains(newVjezd2));
+
+		Zona.delete(zonaGeo.getIdZony());
+		Zona.delete(zonaGeo2.getIdZony());
 	}
 
 	/**
@@ -194,9 +212,12 @@ public class TableTests extends TestCase {
 		JGeometry geo = new JGeometry(0, 0, 10, 10, 1);
 		JGeometry geo2 = JGeometry.createCircle(0, 0, 10, 1);
 
-		Vyjezd newVyjezd = Vyjezd.insert(geo);
+		Zona zonaGeo = Zona.insert("", geo);
+		Zona zonaGeo2 = Zona.insert("", geo2);
+
+		Vyjezd newVyjezd = Vyjezd.insert(zonaGeo);
 		assertTrue("New Vyjezd with name " + testVyjezdName + " does not exists", Vyjezd.list().contains(newVyjezd));
-		Vyjezd newVyjezd2 = Vyjezd.update(newVyjezd.getIdVyjezd(), geo2);
+		Vyjezd newVyjezd2 = Vyjezd.update(newVyjezd.getIdVyjezd(), zonaGeo2);
 		assertTrue("New Vyjezd with name " + testVyjezdName2 + " should not be null but is", newVyjezd2 != null);
 		assertTrue("New Vyjezd with original name " + testVyjezdName + " should be updatable with new name "
 				+ testVyjezdName2 + " but is not", newVyjezd2.getIdVyjezd().equals(newVyjezd.getIdVyjezd()));
@@ -204,6 +225,9 @@ public class TableTests extends TestCase {
 				Vyjezd.delete(newVyjezd2.getIdVyjezd()));
 		assertTrue("New Vyjezd with name " + testVyjezdName2 + " should be deleted but is not",
 				!Vyjezd.list().contains(newVyjezd2));
+
+		Zona.delete(zonaGeo.getIdZony());
+		Zona.delete(zonaGeo2.getIdZony());
 	}
 
 	/**

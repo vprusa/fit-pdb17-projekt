@@ -26,7 +26,8 @@ CREATE TABLE vozidlo(
 CREATE TABLE parkovaci_misto(
     id_mista number  NOT null,
     pozn varchar(255),
-    geo_mista SDO_GEOMETRY,
+    zona_id number not null,
+    CONSTRAINT misto_zona_id_fk FOREIGN key (zona_id) references zona(id_zony),
     CONSTRAINT id_mista_pk primary key (id_mista)
 );
 
@@ -35,7 +36,8 @@ create sequence parkovaci_misto_seq start with 1 increment by 1;
 
 CREATE TABLE vjezd(
     id_vjezd NUMBER NOT null,
-    geo_vjezd SDO_GEOMETRY,
+    zona_id number not null,
+    CONSTRAINT vjezd_zona_id_fk FOREIGN key (zona_id) references zona(id_zony),
     CONSTRAINT pk_vjezd PRIMARY KEY(id_vjezd)
 );
 
@@ -45,7 +47,8 @@ create sequence vjezd_seq start with 1 increment by 1;
 
 CREATE TABLE vyjezd(
     id_vyjezd NUMBER NOT null,
-    geo_vyjezd SDO_GEOMETRY,
+    zona_id number not null,
+    CONSTRAINT vyjezd_zona_id_fk FOREIGN key (zona_id) references zona(id_zony),
     CONSTRAINT pk_vyjezd PRIMARY KEY(id_vyjezd)
 );
 
