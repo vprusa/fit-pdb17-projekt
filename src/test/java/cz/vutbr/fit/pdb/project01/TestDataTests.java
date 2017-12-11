@@ -39,9 +39,9 @@ import oracle.spatial.geometry.JGeometry;
 /**
  * Unit test for simple App.
  */
-public class TempTests extends TestCase {
+public class TestDataTests extends TestCase {
 
-	protected static Logger log = Logger.getLogger(TempTests.class);
+	protected static Logger log = Logger.getLogger(TestDataTests.class);
 
 	/**
 	 * Create the test case
@@ -49,7 +49,7 @@ public class TempTests extends TestCase {
 	 * @param testName
 	 *            name of the test case
 	 */
-	public TempTests(String testName) {
+	public TestDataTests(String testName) {
 		super(testName);
 	}
 
@@ -57,7 +57,7 @@ public class TempTests extends TestCase {
 	 * @return the suite of tests being tested
 	 */
 	public static Test suite() {
-		return new TestSuite(TempTests.class);
+		return new TestSuite(TestDataTests.class);
 	}
 
 	// http://junit.sourceforge.net/junit3.8.1/javadoc/junit/framework/TestCase.html
@@ -70,16 +70,55 @@ public class TempTests extends TestCase {
 	 * @throws IOException
 	 */
 	public void testZonaSelectByIdTableCRUD() throws IOException {
+		String testVjezdName = "testVjezdName";
+		String testVjezdName2 = "testVjezdName2";
+
+		int vjezdW = 20, vjezdH = 10;
+		int vyjezdW = vjezdW, vyjezdH = vjezdH;
+		int carW = 40, carH = 20;
+		
+		JGeometry geo = new JGeometry(10, 10, 10, 10, 1);
+		JGeometry geo2 = JGeometry.createCircle(0, 0, 10, 1);
+		List<JGeometry> carList = new ArrayList<JGeometry>();// List();//Collections.emptyList();
+		// List<JGeometry> carList = Collections.emptyList();
+		int PaddingTop = 50;
+		int lineHeight = 70;
+		int CONST = 70;
+		for (int y = 1; y < 5; y++) {
+			for (int i = 1; i < 5; i++) {
+				double[] da = new double[8];
+				da[0] = CONST * i;
+				da[1] = PaddingTop;
+				da[2] = CONST * i;
+				da[3] = PaddingTop + carH;
+				da[4] = CONST * i + carW;
+				da[5] = PaddingTop + carH;
+				da[6] = CONST * i + carW;
+				da[7] = PaddingTop;
+
+				carList.add(JGeometry.createLinearPolygon(da, 2, 0));
+			}
+			PaddingTop = PaddingTop + lineHeight;
+		}
+
+		carList.stream().forEach(i -> {
+			ParkovaciMisto.insert("Pm.", Zona.insert("pm", i), Collections.emptySet());
+		});
 
 		String resourcesPath = "./";
 		File pathToFile = new File(resourcesPath + "/resources/Hibernate_logo_a.png");
 		Image image = ImageIO.read(pathToFile);
 
 		List<Vozidlo> vozidlos = new ArrayList<Vozidlo>();
+		
+		for (int y = 1; y < 5; y++) {
+			Vozidlo vozidlo = Vozidlo.insert("tSpzU" + y, image, image, Collections.emptySet());
+			vozidlos.add(vozidlo);
+		}
+		
+		
 
-		Vozidlo vozidlo = Vozidlo.insert("tSpzq", image, image, Collections.emptySet());
-		log.info(Vozidlo.selectById("tSpzq").toString());
-		Vozidlo.delete("tSpzq");
+		// JGeometry car1 = JGeometry.createLinearPolygon({10,10, 40, 20}, 2, 0);
 
 	}
 
