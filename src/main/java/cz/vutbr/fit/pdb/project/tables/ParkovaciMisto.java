@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Query;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -164,6 +165,19 @@ public class ParkovaciMisto extends TableBase implements java.io.Serializable {
 			return false;
 		}
 		return true;
+	}
+	
+	public static Long selectObjectByGeometry(JGeometryType geometry) {
+		try {
+			entityManager.getTransaction().begin();
+			List<ParkovaciMisto> result = entityManager.createQuery("from ParkovaciMisto WHERE SDO_RELATE(geoMista, :geo, 'mask=anyinteract') = 'TRUE')", ParkovaciMisto.class).setParameter("geo", geometry).getResultList();
+			entityManager.getTransaction().commit();
+			return result.isEmpty() ? null : result.get(0).getIdMista();
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

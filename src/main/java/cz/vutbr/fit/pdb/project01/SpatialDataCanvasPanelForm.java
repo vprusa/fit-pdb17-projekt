@@ -141,24 +141,9 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		int p1x = x + size; int p1y = y - size;
 		int p2x = x - size; int p2y = y + size;
 		int p3x = x + size; int p3y = y + size;
-		try {
-			
-			Query q = TableBase.getEntityManager().createQuery("SELECT id "
-															 + "FROM ParkovaciMisto "
-															 + "WHERE SDO_RELATE(geoMista, "
-																			  + "SDO_GEOMETRY(2003, NULL, NULL, SDO_ELEM_INFO_ARRAY(1, 1003, 4), "
-																			  + "SDO_ORDINATE_ARRAY(" + p1x + "," + p1y + ", "
-																			  						  + p2x + "," + p2y + ", " 
-																			  						  + p3x + "," + p3y + ")), 'mask=anyinteract') = 'TRUE')", Long.class);
-			
 		
-			List<Long> result = q.getResultList();
-			
-			return result.get(0);
-		} catch (Exception e) {
-			System.out.print("shapeAt: " + e + "\n");
-		}
-		return null;
+		JGeometry geometry = JGeometry.createLinearPolygon(new double[]{p1x, p1y, p2x, p2y, p3x, p3y}, 2, 0);
+		return ParkovaciMisto.selectObjectByGeometry(new JGeometryType(geometry));
 	}
 	
 	private void moveSelectedShape(int deltaX, int deltaY) {
