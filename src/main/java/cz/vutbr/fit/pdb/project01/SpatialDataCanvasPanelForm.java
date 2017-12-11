@@ -15,6 +15,8 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +25,7 @@ import java.util.List;
 public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener, MouseMotionListener {
 
 	public enum SpatialType {
-		parkPlace, entrance, exit, nothing;
+		parkPlace, entrance, exit, zone, nothing;
 	}
 
 	private Map<Long, Shape> shapesMap = new HashMap<>();
@@ -34,6 +36,9 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 
 	private Map<Long, Shape> exitShapesMap = new HashMap<>();
 	private Map<Long, Vyjezd> exitObjectsMap = new HashMap<>();
+	
+	private Map<Long, Shape> zoneShapesMap = new HashMap<>();
+	private Map<Long, Zona> zoneObjectsMap = new HashMap<>();
 
 	private int pressedX;
 	private int pressedY;
@@ -41,6 +46,9 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 	private Zona selectedShape;
 	private boolean selectedShapeChanged = false;
 
+	private boolean zoneAdding = false;
+	private List<Double> zoneAddingShape = new ArrayList<>();
+	
 	private final SpatialDataPanelForm parentFormPanel;
 
 	/**
@@ -69,6 +77,17 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		g2.setPaint(Color.white);
 		g2.fill(bounds);
 
+		for (Map.Entry<Long, Shape> shapeEntry : zoneShapesMap.entrySet()) {
+			if (selectedType == SpatialType.zone && shapeEntry.getKey().equals(selectedShape.getIdZony())) {
+				g2.setPaint(Color.green);
+			} else {
+				g2.setPaint(Color.gray);
+			}
+			g2.fill(shapeEntry.getValue());
+			g2.setPaint(Color.black);
+			g2.draw(shapeEntry.getValue());
+		}
+		
 		for (Map.Entry<Long, Shape> shapeEntry : shapesMap.entrySet()) {
 			if (selectedType == SpatialType.parkPlace && shapeEntry.getKey().equals(selectedShape.getIdZony())) {
 				g2.setPaint(Color.green);
@@ -101,6 +120,22 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 			g2.setPaint(Color.black);
 			g2.draw(shapeEntry.getValue());
 		}
+		
+		if(zoneAdding) {
+			g2.setPaint(Color.green);
+			if(!zoneAddingShape.isEmpty()) {
+				if(zoneAddingShape.size() >= 4) {
+					for(int i = 0; i < (zoneAddingShape.size() / 2)-1; ++i) {
+						System.out.print("for zone: " + i);
+						g2.drawLine(zoneAddingShape.get(i*2).intValue(), zoneAddingShape.get(i*2+1).intValue(),
+								zoneAddingShape.get(i*2+2).intValue(), zoneAddingShape.get(i*2+3).intValue());
+					}
+				}
+				else {
+					g2.drawOval(zoneAddingShape.get(0).intValue(), zoneAddingShape.get(1).intValue(), 5, 5);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -121,8 +156,30 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		pressedX = e.getX();
 		pressedY = e.getY();
 
-		selectedShape = shapeAt(pressedX, pressedY);
-		parentFormPanel.onObjectSelected();
+		if(zoneAdding) {
+			if(!zoneAddingShape.isEmpty()) {
+				if((pressedX - 15) < zoneAddingShape.get(0) && (pressedX + 15) > zoneAddingShape.get(0)) {
+					if((pressedY - 15) < zoneAddingShape.get(1) && (pressedY + 15) > zoneAddingShape.get(1)) {
+						double[] zoneArray = new double[zoneAddingShape.size()];
+						 for (int i = 0; i < zoneArray.length; i++) {
+						    zoneArray[i] = zoneAddingShape.get(i);
+						 }
+						 Zona z = Zona.insert("Nová zóna", JGeometry.createLinearPolygon(zoneArray, 2, 0));
+						 zoneShapesMap.put(z.getIdZony(), z.getGeoZony().getJGeometry().createShape());
+						 zoneObjectsMap.put(z.getIdZony(), z);
+						 
+						 zoneAdding = false;
+						 zoneAddingShape.clear();
+					}
+				}
+			}
+			zoneAddingShape.add((double)pressedX);
+			zoneAddingShape.add((double)pressedY);
+		}
+		else {
+			selectedShape = shapeAt(pressedX, pressedY);
+			parentFormPanel.onObjectSelected();
+		}
 
 		System.out.print("selectedShape: " + selectedShape + "\n");
 		repaint();
@@ -132,8 +189,52 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 	public void mouseReleased(MouseEvent e) {
 		if (selectedShapeChanged) {
 			// update shape (geometry) in sql db
-			saveSelectedShape();
+			switch(selectedType) {
+			case parkPlace:
+				if(Zona.overlapByGeometry(objectsMap.get(selectedShape.getIdZony()).getZona())) {
+					objectsMap.put(selectedShape.getIdZony(), ParkovaciMisto.getByZona(selectedShape));
+					shapesMap.put(selectedShape.getIdZony(), ParkovaciMisto.getByZona(selectedShape).getJGeometry().createShape());
+				}
+				else {
+					saveSelectedShape();
+				}
+				break;
+				
+			case entrance:
+				if(Zona.overlapByGeometry(entranceObjectsMap.get(selectedShape.getIdZony()).getZona())) {
+					entranceObjectsMap.put(selectedShape.getIdZony(), Vjezd.getByZona(selectedShape));
+					entranceShapesMap.put(selectedShape.getIdZony(), Vjezd.getByZona(selectedShape).getJGeometry().createShape());
+				}
+				else {
+					saveSelectedShape();
+				}
+				break;
+				
+			case exit:
+				if(Zona.overlapByGeometry(exitObjectsMap.get(selectedShape.getIdZony()).getZona())) {
+					exitObjectsMap.put(selectedShape.getIdZony(), Vyjezd.getByZona(selectedShape));
+					exitShapesMap.put(selectedShape.getIdZony(), Vyjezd.getByZona(selectedShape).getJGeometry().createShape());
+				}
+				else {
+					saveSelectedShape();
+				}
+				break;
+				
+			case zone: 
+				if(Zona.overlapByGeometry(objectsMap.get(selectedShape.getIdZony()).getZona())) {
+					zoneObjectsMap.put(selectedShape.getIdZony(), selectedShape);
+					zoneShapesMap.put(selectedShape.getIdZony(), selectedShape.getJGeoZony().createShape());
+				}
+				else {
+					saveSelectedShape();
+				}
+				break;
+				
+			case nothing:
+				break;
+			}
 			selectedShapeChanged = false;
+			repaint();
 		}
 	}
 
@@ -209,13 +310,20 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		ParkovaciMisto pm = ParkovaciMisto.getByZona(idx);
 		Vjezd vj = Vjezd.getByZona(idx);
 		Vyjezd vy = Vyjezd.getByZona(idx);
-		if (pm != null)
+		if (pm != null) {
 			selectedType = SpatialType.parkPlace;
-		if (vj != null)
+			return idx;
+		}
+		if (vj != null) {
 			selectedType = SpatialType.entrance;
-		if (vy != null)
+			return idx;
+		}
+		if (vy != null) {
 			selectedType = SpatialType.exit;
-		selectedShape = idx;
+			return idx;
+		}
+		selectedType = SpatialType.zone;
+		//selectedShape = idx;
 		System.out.println("selectedType");
 		System.out.println(selectedType);
 		System.out.println(selectedShape);
@@ -274,6 +382,21 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 			exitObjectsMap.put(selectedShape.getIdZony(), exit);
 			exitShapesMap.put(selectedShape.getIdZony(), exitGeometry.createShape());
 			break;
+			
+		case zone:
+			Zona zone = zoneObjectsMap.get(selectedShape.getIdZony());
+			JGeometry zoneGeometry = zone.getJGeoZony();
+
+			for (int i = 0; i < zoneGeometry.getOrdinatesArray().length; i = i + 2) {
+				zoneGeometry.getOrdinatesArray()[i] = zoneGeometry.getOrdinatesArray()[i] + deltaX;
+				zoneGeometry.getOrdinatesArray()[i + 1] = zoneGeometry.getOrdinatesArray()[i + 1] + deltaY;
+			}
+
+			// exit.setZona();
+			zone.setGeoZony(new JGeometryType(zoneGeometry));
+			zoneObjectsMap.put(selectedShape.getIdZony(), zone);
+			zoneShapesMap.put(selectedShape.getIdZony(), zoneGeometry.createShape());
+			break;
 
 		case nothing:
 			break;
@@ -287,6 +410,23 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		try {
 			// Query q = TableBase.getEntityManager().createQuery("SELECT p FROM
 			// ParkovaciMisto p", ParkovaciMisto.class);
+			
+			List<Zona> zoneResultList = Zona.list();
+			for (Zona result : zoneResultList) {
+				System.out.print("result.getParkovaciMistos(): " + result.getParkovaciMistos() + "\n");
+				System.out.print("result.getVjezds(): " + result.getVjezds() + "\n");
+				System.out.print("result.getVyjezds(): " + result.getVyjezds() + "\n");
+				if(result.getParkovaciMistos().isEmpty() &&  result.getVjezds().isEmpty() &&  result.getVyjezds().isEmpty()) {
+					zoneObjectsMap.put(result.getIdZony(), result);
+					zoneShapesMap.put(result.getIdZony(), result.getGeoZony().getJGeometry().createShape());
+					System.out.print("Zona result: " + result.getIdZony().toString() + ", geo: "
+							+ result.getGeoZony().getJGeometry().toStringFull() + "\n");
+				}
+				/*objectsMap.put(result.getZona().getIdZony(), result);
+				shapesMap.put(result.getZona().getIdZony(), result.getJGeometry().createShape());
+				System.out.print("ParkovaciMisto result: " + result.getIdMista().toString() + ", geo: "
+						+ result.getJGeometry().toStringFull() + "\n");*/
+			}
 
 			List<ParkovaciMisto> parkPlaceresultList = ParkovaciMisto.list();
 			for (ParkovaciMisto result : parkPlaceresultList) {
@@ -341,6 +481,11 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 			Vyjezd exit = exitObjectsMap.get(selectedShape.getIdZony());
 			Vyjezd.update(exit.getIdVyjezd(), exit.getZona());
 			break;
+			
+		case zone:
+			Zona zone = zoneObjectsMap.get(selectedShape.getIdZony());
+			Zona.update(zone.getIdZony(), zone.getNazevZony(), zone.getJGeoZony());
+			break;
 
 		case nothing:
 			break;
@@ -368,6 +513,10 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 	public Vyjezd getExitByID(Long id) {
 		return exitObjectsMap.get(id);
 	}
+	
+	public Zona getZoneByID(Long id) {
+		return zoneObjectsMap.get(id);
+	}
 
 	public void deleteSelected() {
 		switch (selectedType) {
@@ -392,6 +541,13 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 			repaint();
 			break;
 
+		case zone:
+			zoneObjectsMap.remove(selectedShape.getIdZony());
+			zoneShapesMap.remove(selectedShape.getIdZony());
+			Zona.delete(selectedShape.getIdZony());
+			repaint();
+			break;
+			
 		case nothing:
 			break;
 		}
@@ -440,6 +596,12 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		exitShapesMap.put(exit.getZona().getIdZony(), exit.getJGeometry().createShape());
 
 		repaint();
+	}
+
+	public void addZone() {
+		zoneAdding = true;
+		selectedShape = null;
+		selectedType = SpatialType.nothing;
 	}
 
 }

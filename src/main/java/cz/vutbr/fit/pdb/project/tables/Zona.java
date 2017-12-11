@@ -261,5 +261,21 @@ public class Zona extends TableBase implements java.io.Serializable {
 		}
 		return Collections.emptyList();
 	}
+	
+	public static boolean overlapByGeometry(Zona zone) {
+		try {
+			List<Zona> resultList = selectObjectsByGeometry(zone.getJGeoZony());
+			for(Zona resultZone : resultList) {
+				if(resultZone.getIdZony() != zone.getIdZony()) {
+					return true;
+				}
+			}
+			return false;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	//"select id from Zona where SDO_RELATE(geometry, ?, 'mask=ANYINTERACT') = 'TRUE'")
 
 }

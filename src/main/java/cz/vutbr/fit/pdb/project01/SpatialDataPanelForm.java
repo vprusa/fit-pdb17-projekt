@@ -7,6 +7,7 @@ import javax.swing.*;
 import cz.vutbr.fit.pdb.project.tables.ParkovaciMisto;
 import cz.vutbr.fit.pdb.project.tables.Vjezd;
 import cz.vutbr.fit.pdb.project.tables.Vyjezd;
+import cz.vutbr.fit.pdb.project.tables.Zona;
 import cz.vutbr.fit.pdb.project01.SpatialDataCanvasPanelForm.SpatialType;
 
 import java.awt.*;
@@ -88,6 +89,10 @@ public class SpatialDataPanelForm extends JPanel {
 		    		
 		    	case "Výjezd":
 		    		canvasPanel.addExit();
+		    		break;
+		    		
+		    	case "Zóna":
+		    		canvasPanel.addZone();
 		    		break;
 		    	}
 		    }
@@ -249,10 +254,17 @@ public class SpatialDataPanelForm extends JPanel {
 		case exit:
 			Vyjezd exit = canvasPanel.getExitByID(canvasPanel.getSelectedObjectID());
 			id.setText(exit.getIdVyjezd().toString());
-			elementType.setText("Vyjezd");
+			elementType.setText("Výjezd");
 			ElementName.setText("-");
 			parrentZone.setText("-");
 			break;
+			
+		case zone:
+			Zona zone = canvasPanel.getZoneByID(canvasPanel.getSelectedObjectID());
+			id.setText(zone.getIdZony().toString());
+			elementType.setText("Zóna");
+			ElementName.setText(zone.getNazevZony());
+			parrentZone.setText("-");
 			
 		case nothing:
 			id.setText("-");
