@@ -35,6 +35,8 @@ import javax.swing.JTable;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.awt.event.ActionEvent;
 import javax.swing.Box;
 
@@ -59,6 +61,7 @@ public class MainForm extends JFrame {
 	private JTextField deleteFrom;
 	private JTextField deleteTo;
 	private JTable currentResidence;
+	private JTextField SPZ;
 
 	/**
 	 * Launch the application.
@@ -157,14 +160,12 @@ public class MainForm extends JFrame {
 		JPanel textPanel = new JPanel();
 		multimedialniData.add(textPanel);
 		textPanel.setLayout(new BorderLayout(0, 0));
-
-		JList list = new JList();
+		String[] originalList = originalListRefresh();
+		
+		JList<String> list = new JList<String>();
 		list.setVisibleRowCount(20);
 		list.setModel(new AbstractListModel() {
-			String[] values = new String[] { "test", "test2", "test3", "test4", "test5", "test6", "test7", "test8",
-					"test9", "test10", "test11", "test12", "test13", "test14", "test15", "test16", "test17", "test18",
-					"test19", "test20", "test21", "test22", "test23", "test24", "test25", "test26", "test27", "test28",
-					"test29", "test30", "test31", "test32", "test33", "test34", "test35" };
+			String[] values = originalList;
 
 			public int getSize() {
 				return values.length;
@@ -181,16 +182,84 @@ public class MainForm extends JFrame {
 		JPanel filterPanel = new JPanel();
 		textPanel.add(filterPanel, BorderLayout.SOUTH);
 		filterPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		
+		JButton btnRefresh = new JButton("Obnovit");
+		btnRefresh.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				originalListRefresh();
+				list.setModel(new AbstractListModel() {
+					String[] values = originalList;
+
+					public int getSize() {
+						return values.length;
+					}
+
+					public Object getElementAt(int index) {
+						return values[index];
+					}
+				});
+			}
+		});
+		filterPanel.add(btnRefresh);
 
 		JPanel searchPanel = new JPanel();
 		filterPanel.add(searchPanel);
+		
+		JButton btnClear = new JButton("Vyčistit");
+		btnClear.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				list.setModel(new AbstractListModel() {
+				String[] values = originalList;
+
+				public int getSize() {
+					return values.length;
+				}
+
+				public Object getElementAt(int index) {
+					return values[index];
+				}
+			});
+				btnClear.setEnabled(false);
+			}
+		});
+		btnClear.setEnabled(false);
+		searchPanel.add(btnClear);
 
 		searchText = new JTextField();
 		searchPanel.add(searchText);
 		searchText.setColumns(20);
 
-		JButton btnSearchButton = new JButton("Search");
+		JButton btnSearchButton = new JButton("Hledat");
+		btnSearchButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				List<String> newList = new ArrayList<>();
+				for (String string : originalList)
+				{
+					if (string.matches(String.format(".*%s.*", searchText.getText())))
+					{
+						newList.add(string);
+					}
+				}
+				list.setModel(new AbstractListModel() {
+					String[] stockArr = new String[newList.size()];
+					String[] values = newList.toArray(stockArr);
+					
+					public int getSize() {
+						return values.length;
+					}
+
+					public Object getElementAt(int index) {
+						return values[index];
+					}
+				});
+				btnClear.setEnabled(true);
+			}
+		});
 		searchPanel.add(btnSearchButton);
+		
+		JButton btnNewEntry = new JButton("Nový záznam");
+		btnNewEntry.setEnabled(false);
+		filterPanel.add(btnNewEntry);
 		
 		Component horizontalStrut_3 = Box.createHorizontalStrut(20);
 		multimedialniData.add(horizontalStrut_3);
@@ -202,22 +271,63 @@ public class MainForm extends JFrame {
 		JPanel pictureItself = new JPanel();
 		pictureItself.setBackground(Color.WHITE);
 		picturePanel.add(pictureItself);
+		pictureItself.setLayout(new BoxLayout(pictureItself, BoxLayout.Y_AXIS));
+		
+		JPanel panel_2 = new JPanel();
+		pictureItself.add(panel_2);
 
-		JLabel PictureLabel = new JLabel();
-		pictureItself.add(PictureLabel);
-
-		JPanel pictureDetail = new JPanel();
-		pictureDetail.setMaximumSize(new Dimension(10000,100));
-		picturePanel.add(pictureDetail);
-
-		JButton btRotateLeft = new JButton("Rotovat vlevo");
-		pictureDetail.add(btRotateLeft);
-
-		JButton btnRotateRight = new JButton("Rotovat vpravo");
-		pictureDetail.add(btnRotateRight);
+		JLabel SPZLabel = new JLabel();
+		panel_2.add(SPZLabel);
+		SPZLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		JPanel picPanel = new JPanel();
+		picPanel.setMaximumSize(new Dimension(10000, 100));
+		pictureItself.add(picPanel);
+		
+		JButton btRotateLeft1 = new JButton("Rotovat vlevo");
+		picPanel.add(btRotateLeft1);
+		
+		JButton btRotateRight1 = new JButton("Rotovat vpravo");
+		picPanel.add(btRotateRight1);
+		
+		Component verticalStrut = Box.createVerticalStrut(20);
+		pictureItself.add(verticalStrut);
+		
+		JPanel panel_1 = new JPanel();
+		pictureItself.add(panel_1);
+		
+		JLabel CarLabel = new JLabel();
+		panel_1.add(CarLabel);
+		CarLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		Component verticalStrut_1 = Box.createVerticalStrut(20);
+		pictureItself.add(verticalStrut_1);
+		
+				JPanel SPZDetail = new JPanel();
+				pictureItself.add(SPZDetail);
+				SPZDetail.setMaximumSize(new Dimension(10000,100));
+				
+						JButton btRotateLeft = new JButton("Rotovat vlevo");
+						SPZDetail.add(btRotateLeft);
+						
+								JButton btnRotateRight = new JButton("Rotovat vpravo");
+								SPZDetail.add(btnRotateRight);
+		
+		JPanel panel = new JPanel();
+		panel.setMaximumSize(new Dimension(1000,100));
+		pictureItself.add(panel);
+		
+		JLabel lblNewLabel = new JLabel("SPZ:");
+		panel.add(lblNewLabel);
+		lblNewLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		SPZ = new JTextField();
+		SPZ.setText("");
+		panel.add(SPZ);
+		SPZ.setColumns(20);
 		
 		JButton btnSave = new JButton("Uložit");
-		pictureDetail.add(btnSave);
+		panel.add(btnSave);
 
 		JPanel temporalniData = new JPanel();
 		mainPanel.addTab("Temporální data", null, temporalniData, null);
@@ -322,6 +432,14 @@ public class MainForm extends JFrame {
 		
 		JButton btnDeleteButton = new JButton("Smazat");
 		DeleteButtonsPanel.add(btnDeleteButton);
+	}
+
+	private String[] originalListRefresh() {
+		return new String[] { "test", "test2", "test3", "test4", "test5", "test6", "test7", "test8",
+				"test9", "test10", "test11", "test12", "test13", "test14", "test15", "test16", "test17", "test18",
+				"test19", "test20", "test21", "test22", "test23", "test24", "test25", "test26", "test27", "test28",
+				"test29", "test30", "test31", "test32", "test33", "test34", "test35" };
+		
 	}
 
 }

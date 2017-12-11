@@ -66,6 +66,7 @@ public class SpatialDataPanelForm extends JPanel {
 		elementChoice.add("Parkovací místo");
 		elementChoice.add("Vjezd");
 		elementChoice.add("Výjezd");
+		elementChoice.add("Zóna");
 		addPanel.add(elementChoice);
 		
 		JButton btnAddElement = new JButton("Přidat");
