@@ -5,10 +5,13 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
+import java.sql.Connection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,6 +20,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
@@ -176,6 +181,49 @@ public class Vozidlo extends TableBase {
 			Vozidlo v = (Vozidlo) entityManager.createQuery("from Vozidlo where SPZ=:spz").setParameter("spz", spz)
 					.getSingleResult();
 			entityManager.getTransaction().commit();
+
+			return v;
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static Vozidlo getCurrentVozidlo(ParkovaciMisto parkovaciMistos) {
+		try {
+			// ParkovaciMisto parkovaciMistos = pm;
+			// v pobytu mam auto_id
+			// v parkovani mam pobyt_id jako fk k pobytu a misto_ID ref na parkovaciMisto
+			// musim vybrat vsechny parkovani pro ktere ja misto_id = pm.id_mista
+			// z techto zaznamu vyberu tu ktere spadaji pod NOW
+			// z techto zaznamu vzit pobyt_id
+			// v pobyt najit zaznamy kde se id_pobyt = pobyt_id
+			Vozidlo v = null;
+			entityManager.getTransaction().begin();
+
+			// https://stackoverflow.com/questions/15359306/how-to-load-lazy-fetched-items-from-hibernate-jpa-in-my-controller
+			parkovaciMistos.getParkovanis().size();
+			// https://stackoverflow.com/questions/17318340/how-hibernate-initialize-works
+			Hibernate.initialize(parkovaciMistos.getParkovanis());
+			Optional<Parkovani> parkovaniOpt = parkovaciMistos.getParkovanis().stream()
+					.filter(i -> i.getZacatek().before(new Date()) && i.getKonec() == null).findFirst();
+			if (parkovaniOpt.isPresent()) {
+				Parkovani parkovani = parkovaniOpt.get();
+				log.debug("parkovani");
+				log.debug(parkovani);
+				Hibernate.initialize(parkovani);
+				Hibernate.initialize(parkovani.getPobyt());
+				Pobyt p = parkovani.getPobyt();
+				log.debug("Pobyt");
+				log.debug(p.toString());
+				Hibernate.initialize(p.getVozidlo());
+				v = p.getVozidlo();
+				log.debug("vozidlo");
+				log.debug(v.getSpz());
+			}
+
+			entityManager.getTransaction().commit();
 			return v;
 		} catch (Exception e) {
 			entityManager.getTransaction().rollback();
@@ -198,4 +246,5 @@ public class Vozidlo extends TableBase {
 		}
 		return null;
 	}
+
 }

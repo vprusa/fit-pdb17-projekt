@@ -22,10 +22,6 @@ public class PobytModel extends AbstractTableModel {
         return columnNames[col];
     }
     
-    public String (int col) {
-        return columnNames[col];
-    }
-
     public Object getValueAt(int row, int col) {
         return data[row][col];
     }

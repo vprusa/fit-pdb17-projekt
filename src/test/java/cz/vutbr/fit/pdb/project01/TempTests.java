@@ -71,16 +71,12 @@ public class TempTests extends TestCase {
 	 */
 	public void testZonaSelectByIdTableCRUD() throws IOException {
 
-		String resourcesPath = "./";
-		File pathToFile = new File(resourcesPath + "/resources/Hibernate_logo_a.png");
-		Image image = ImageIO.read(pathToFile);
-
-		List<Vozidlo> vozidlos = new ArrayList<Vozidlo>();
-
-		Vozidlo vozidlo = Vozidlo.insert("tSpzq", image, image, Collections.emptySet());
-		log.info(Vozidlo.selectById("tSpzq").toString());
-		Vozidlo.delete("tSpzq");
-
+		ParkovaciMisto pm = ParkovaciMisto.list().get(0);
+		log.info("pm.toString()");
+		log.info(pm.toString());
+		Vozidlo v = Vozidlo.getCurrentVozidlo(pm);
+		log.info(v);
+		log.info(v.getSpz());
 	}
 
 }
