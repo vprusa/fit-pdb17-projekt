@@ -145,7 +145,7 @@ public class TestDataTests extends TestCase {
 		List<Pobyt> pobyts = new ArrayList<Pobyt>();
 
 		for (int y = 1; y < recordsCount; y++) {
-			Pobyt pobyt = Pobyt.insert(vjezd1, vozidlos.get(y - 1), vyjezd1, new Date(), new Date(),
+			Pobyt pobyt = Pobyt.insert(vjezd1, vozidlos.get(y - 1), vyjezd1, new Date(), null,
 					Collections.emptySet());
 			pobyts.add(pobyt);
 		}
@@ -153,7 +153,7 @@ public class TestDataTests extends TestCase {
 		List<Parkovani> parkovanis = new ArrayList<Parkovani>();
 		for (int y = 1; y < recordsCount; y++) {
 			Parkovani parkovani = Parkovani.insert(parkovaciMistos.get(y - 1), pobyts.get(y - 1), new Date(),
-					new Date());
+					null);
 			parkovanis.add(parkovani);
 		}
 

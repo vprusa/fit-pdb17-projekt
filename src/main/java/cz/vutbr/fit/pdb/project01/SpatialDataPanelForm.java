@@ -240,8 +240,8 @@ public class SpatialDataPanelForm extends JPanel {
 	}
 
 	public void onObjectSelected() {
-		
-		switch(canvasPanel.getSelectedObjectType()) {
+
+		switch (canvasPanel.getSelectedObjectType()) {
 		case parkPlace:
 			ParkovaciMisto parkPlace = canvasPanel.getParkPlaceByID(canvasPanel.getSelectedObjectID());
 			id.setText(parkPlace.getIdMista().toString());
@@ -249,31 +249,37 @@ public class SpatialDataPanelForm extends JPanel {
 			ElementName.setText(parkPlace.getPozn());
 			parrentZone.setText("-");
 			Vozidlo v = Vozidlo.getCurrentVozidlo(parkPlace);
-			if(v != null)
+			if (v != null)
 				vozidlo.setText(v.getSpz());
+			else
+				vozidlo.setText("");
+
 			break;
-			
+
 		case entrance:
 			Vjezd entrance = canvasPanel.getEntranceByID(canvasPanel.getSelectedObjectID());
 			id.setText(entrance.getIdVjezd().toString());
 			elementType.setText("Vjezd");
 			ElementName.setText("-");
 			parrentZone.setText("-");
+			vozidlo.setText("");
 			break;
-			
+
 		case exit:
 			Vyjezd exit = canvasPanel.getExitByID(canvasPanel.getSelectedObjectID());
 			id.setText(exit.getIdVyjezd().toString());
 			elementType.setText("Vyjezd");
 			ElementName.setText("-");
 			parrentZone.setText("-");
+			vozidlo.setText("");
 			break;
-			
+
 		case nothing:
 			id.setText("-");
 			elementType.setText("-");
 			ElementName.setText("-");
 			parrentZone.setText("-");
+			vozidlo.setText("");
 			break;
 		}
 	}

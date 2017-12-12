@@ -18,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -196,37 +197,35 @@ public class Vozidlo extends TableBase {
 			// z techto zaznamu vyberu tu ktere spadaji pod NOW
 			// z techto zaznamu vzit pobyt_id
 			// v pobyt najit zaznamy kde se id_pobyt = pobyt_id
-			/*
-			 * log.info("parkovaciMistos"); log.info(parkovaciMistos);
-			 * log.info("parkovaciMistos.getParkovanis().toArray().toString()");
-			 * parkovaciMistos.getParkovanis().forEach(i -> { log.info("i");
-			 * log.info(i.toString()); log.info(i.getZacatek().toGMTString()); // i.get });
-			 */
-			Optional<Parkovani> parkovaniOpt = parkovaciMistos.getParkovanis().stream().filter(
-					// i -> i.getZacatek().before(new Date()) && (i.getKonec() == null ||
-					// i.getKonec().after(new Date())))
-					i -> i.getZacatek().before(new Date())).findFirst();
-			// log.info("parkovaniOpt");
-			// log.info(parkovaniOpt);
-			Parkovani parkovani = parkovaniOpt.get();
+			Vozidlo v = null;
+			entityManager.getTransaction().begin();
 
-			// log.info("parkovani");
-			// log.info(parkovani);
-			// log.info("parkovani.getPobyt().getVozidlo()");
-			// log.info(parkovani.getPobyt().getVozidlo());
-			//return null;
-			//if (parkovani != null && parkovani.getPobyt() != null && parkovani.getPobyt().getVozidlo() != null)
-			//	return parkovani.getPobyt().getVozidlo();
+			// https://stackoverflow.com/questions/15359306/how-to-load-lazy-fetched-items-from-hibernate-jpa-in-my-controller
+			parkovaciMistos.getParkovanis().size();
+			// https://stackoverflow.com/questions/17318340/how-hibernate-initialize-works
+			Hibernate.initialize(parkovaciMistos.getParkovanis());
+			Optional<Parkovani> parkovaniOpt = parkovaciMistos.getParkovanis().stream()
+					.filter(i -> i.getZacatek().before(new Date()) && i.getKonec() == null).findFirst();
+			if (parkovaniOpt.isPresent()) {
+				Parkovani parkovani = parkovaniOpt.get();
+				log.debug("parkovani");
+				log.debug(parkovani);
+				Hibernate.initialize(parkovani);
+				Hibernate.initialize(parkovani.getPobyt());
+				Pobyt p = parkovani.getPobyt();
+				log.debug("Pobyt");
+				log.debug(p.toString());
+				Hibernate.initialize(p.getVozidlo());
+				v = p.getVozidlo();
+				log.debug("vozidlo");
+				log.debug(v.getSpz());
+			}
 
-			// Vozidlo.selectById()
-
-			log.info(parkovaciMistos.getParkovanis().toArray().toString());
-			log.info(parkovaciMistos.getParkovanis().toArray().toString());
 			entityManager.getTransaction().commit();
-			return null;
+			return v;
 		} catch (Exception e) {
 			entityManager.getTransaction().rollback();
-			// e.printStackTrace();
+			e.printStackTrace();
 		}
 		return null;
 	}
