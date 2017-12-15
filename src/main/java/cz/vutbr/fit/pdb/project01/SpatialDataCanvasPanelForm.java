@@ -19,6 +19,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 
 	private Map<Long, Shape> exitShapesMap = new HashMap<>();
 	private Map<Long, Vyjezd> exitObjectsMap = new HashMap<>();
-	
+
 	private Map<Long, Shape> zoneShapesMap = new HashMap<>();
 	private Map<Long, Zona> zoneObjectsMap = new HashMap<>();
 
@@ -48,7 +49,7 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 
 	private boolean zoneAdding = false;
 	private List<Double> zoneAddingShape = new ArrayList<>();
-	
+
 	private final SpatialDataPanelForm parentFormPanel;
 
 	/**
@@ -87,7 +88,7 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 			g2.setPaint(Color.black);
 			g2.draw(shapeEntry.getValue());
 		}
-		
+
 		for (Map.Entry<Long, Shape> shapeEntry : shapesMap.entrySet()) {
 			if (selectedType == SpatialType.parkPlace && shapeEntry.getKey().equals(selectedShape.getIdZony())) {
 				g2.setPaint(Color.green);
@@ -120,18 +121,17 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 			g2.setPaint(Color.black);
 			g2.draw(shapeEntry.getValue());
 		}
-		
-		if(zoneAdding) {
+
+		if (zoneAdding) {
 			g2.setPaint(Color.green);
-			if(!zoneAddingShape.isEmpty()) {
-				if(zoneAddingShape.size() >= 4) {
-					for(int i = 0; i < (zoneAddingShape.size() / 2)-1; ++i) {
+			if (!zoneAddingShape.isEmpty()) {
+				if (zoneAddingShape.size() >= 4) {
+					for (int i = 0; i < (zoneAddingShape.size() / 2) - 1; ++i) {
 						System.out.print("for zone: " + i);
-						g2.drawLine(zoneAddingShape.get(i*2).intValue(), zoneAddingShape.get(i*2+1).intValue(),
-								zoneAddingShape.get(i*2+2).intValue(), zoneAddingShape.get(i*2+3).intValue());
+						g2.drawLine(zoneAddingShape.get(i * 2).intValue(), zoneAddingShape.get(i * 2 + 1).intValue(),
+								zoneAddingShape.get(i * 2 + 2).intValue(), zoneAddingShape.get(i * 2 + 3).intValue());
 					}
-				}
-				else {
+				} else {
 					g2.drawOval(zoneAddingShape.get(0).intValue(), zoneAddingShape.get(1).intValue(), 5, 5);
 				}
 			}
@@ -156,27 +156,27 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		pressedX = e.getX();
 		pressedY = e.getY();
 
-		if(zoneAdding) {
-			if(!zoneAddingShape.isEmpty()) {
-				if((pressedX - 15) < zoneAddingShape.get(0) && (pressedX + 15) > zoneAddingShape.get(0)) {
-					if((pressedY - 15) < zoneAddingShape.get(1) && (pressedY + 15) > zoneAddingShape.get(1)) {
+		if (zoneAdding) {
+			if (!zoneAddingShape.isEmpty()) {
+				if ((pressedX - 15) < zoneAddingShape.get(0) && (pressedX + 15) > zoneAddingShape.get(0)) {
+					if ((pressedY - 15) < zoneAddingShape.get(1) && (pressedY + 15) > zoneAddingShape.get(1)) {
 						double[] zoneArray = new double[zoneAddingShape.size()];
-						 for (int i = 0; i < zoneArray.length; i++) {
-						    zoneArray[i] = zoneAddingShape.get(i);
-						 }
-						 Zona z = Zona.insert("Nová zóna", JGeometry.createLinearPolygon(zoneArray, 2, 0));
-						 zoneShapesMap.put(z.getIdZony(), z.getGeoZony().getJGeometry().createShape());
-						 zoneObjectsMap.put(z.getIdZony(), z);
-						 
-						 zoneAdding = false;
-						 zoneAddingShape.clear();
+						for (int i = 0; i < zoneArray.length; i++) {
+							zoneArray[i] = zoneAddingShape.get(i);
+						}
+						Zona z = Zona.insert("Nová zóna", JGeometry.createLinearPolygon(zoneArray, 2, 0));
+						zoneShapesMap.put(z.getIdZony(), z.getGeoZony().getJGeometry().createShape());
+						zoneObjectsMap.put(z.getIdZony(), z);
+
+						zoneAdding = false;
+						zoneAddingShape.clear();
+						return;
 					}
 				}
 			}
-			zoneAddingShape.add((double)pressedX);
-			zoneAddingShape.add((double)pressedY);
-		}
-		else {
+			zoneAddingShape.add((double) pressedX);
+			zoneAddingShape.add((double) pressedY);
+		} else {
 			selectedShape = shapeAt(pressedX, pressedY);
 			parentFormPanel.onObjectSelected();
 		}
@@ -189,47 +189,46 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 	public void mouseReleased(MouseEvent e) {
 		if (selectedShapeChanged) {
 			// update shape (geometry) in sql db
-			switch(selectedType) {
+			switch (selectedType) {
 			case parkPlace:
-				if(Zona.overlapByGeometry(objectsMap.get(selectedShape.getIdZony()).getZona())) {
+				if (Zona.overlapByGeometry(objectsMap.get(selectedShape.getIdZony()).getZona())) {
 					objectsMap.put(selectedShape.getIdZony(), ParkovaciMisto.getByZona(selectedShape));
-					shapesMap.put(selectedShape.getIdZony(), ParkovaciMisto.getByZona(selectedShape).getJGeometry().createShape());
-				}
-				else {
+					shapesMap.put(selectedShape.getIdZony(),
+							ParkovaciMisto.getByZona(selectedShape).getJGeometry().createShape());
+				} else {
 					saveSelectedShape();
 				}
 				break;
-				
+
 			case entrance:
-				if(Zona.overlapByGeometry(entranceObjectsMap.get(selectedShape.getIdZony()).getZona())) {
+				if (Zona.overlapByGeometry(entranceObjectsMap.get(selectedShape.getIdZony()).getZona())) {
 					entranceObjectsMap.put(selectedShape.getIdZony(), Vjezd.getByZona(selectedShape));
-					entranceShapesMap.put(selectedShape.getIdZony(), Vjezd.getByZona(selectedShape).getJGeometry().createShape());
-				}
-				else {
+					entranceShapesMap.put(selectedShape.getIdZony(),
+							Vjezd.getByZona(selectedShape).getJGeometry().createShape());
+				} else {
 					saveSelectedShape();
 				}
 				break;
-				
+
 			case exit:
-				if(Zona.overlapByGeometry(exitObjectsMap.get(selectedShape.getIdZony()).getZona())) {
+				if (Zona.overlapByGeometry(exitObjectsMap.get(selectedShape.getIdZony()).getZona())) {
 					exitObjectsMap.put(selectedShape.getIdZony(), Vyjezd.getByZona(selectedShape));
-					exitShapesMap.put(selectedShape.getIdZony(), Vyjezd.getByZona(selectedShape).getJGeometry().createShape());
-				}
-				else {
+					exitShapesMap.put(selectedShape.getIdZony(),
+							Vyjezd.getByZona(selectedShape).getJGeometry().createShape());
+				} else {
 					saveSelectedShape();
 				}
 				break;
-				
-			case zone: 
-				if(Zona.overlapByGeometry(objectsMap.get(selectedShape.getIdZony()).getZona())) {
+
+			case zone:
+				if (Zona.overlapByGeometry(objectsMap.get(selectedShape.getIdZony()).getZona())) {
 					zoneObjectsMap.put(selectedShape.getIdZony(), selectedShape);
 					zoneShapesMap.put(selectedShape.getIdZony(), selectedShape.getJGeoZony().createShape());
-				}
-				else {
+				} else {
 					saveSelectedShape();
 				}
 				break;
-				
+
 			case nothing:
 				break;
 			}
@@ -289,11 +288,58 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 
 		JGeometry geometry = JGeometry.createLinearPolygon(new double[] { p1x, p1y, p2x, p2y, p3x, p3y }, 2, 0);
 		List<Zona> l = Zona.selectObjectsByGeometry(geometry);// todo get by priority
-		if(l.isEmpty()) {
+		if (l.isEmpty()) {
 			selectedType = SpatialType.nothing;
 			return null;
 		}
-		idx = l.get(0); 
+		idx = l.get(0);
+		Iterator<Zona> it = l.iterator();
+
+		while (it.hasNext()) {
+			Zona z = it.next();
+			if (Vyjezd.getByZona(z) != null) {
+
+				if (Vyjezd.getByZona(idx) != null) {
+
+				} else if (Vjezd.getByZona(idx) != null) {
+
+				} else if (ParkovaciMisto.getByZona(idx) != null) {
+					idx = z;
+				} else {
+					// default zona
+					idx = z;
+				}
+
+			} else if (Vjezd.getByZona(z) != null) {
+				if (Vyjezd.getByZona(idx) != null) {
+
+				} else if (Vjezd.getByZona(idx) != null) {
+
+				} else if (ParkovaciMisto.getByZona(idx) != null) {
+					idx = z;
+
+				} else {
+					// default zona
+					idx = z;
+				}
+
+			} else if (ParkovaciMisto.getByZona(z) != null) {
+				if (Vyjezd.getByZona(idx) != null) {
+
+				} else if (Vjezd.getByZona(idx) != null) {
+
+				} else if (ParkovaciMisto.getByZona(idx) != null) {
+
+				} else {
+					// default zona
+					idx = z;
+				}
+			} else {
+				// default zona
+
+			}
+		}
+
 		// Zona zona = Zona.selectObjectByGeometry(geometry);
 
 		/*
@@ -323,11 +369,11 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 			return idx;
 		}
 		selectedType = SpatialType.zone;
-		//selectedShape = idx;
+		// selectedShape = idx;
 		System.out.println("selectedType");
 		System.out.println(selectedType);
 		System.out.println(selectedShape);
-		
+
 		return idx;
 	}
 
@@ -382,7 +428,7 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 			exitObjectsMap.put(selectedShape.getIdZony(), exit);
 			exitShapesMap.put(selectedShape.getIdZony(), exitGeometry.createShape());
 			break;
-			
+
 		case zone:
 			Zona zone = zoneObjectsMap.get(selectedShape.getIdZony());
 			JGeometry zoneGeometry = zone.getJGeoZony();
@@ -410,22 +456,26 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		try {
 			// Query q = TableBase.getEntityManager().createQuery("SELECT p FROM
 			// ParkovaciMisto p", ParkovaciMisto.class);
-			
+
 			List<Zona> zoneResultList = Zona.list();
 			for (Zona result : zoneResultList) {
 				System.out.print("result.getParkovaciMistos(): " + result.getParkovaciMistos() + "\n");
 				System.out.print("result.getVjezds(): " + result.getVjezds() + "\n");
 				System.out.print("result.getVyjezds(): " + result.getVyjezds() + "\n");
-				if(result.getParkovaciMistos().isEmpty() &&  result.getVjezds().isEmpty() &&  result.getVyjezds().isEmpty()) {
+				if (result.getParkovaciMistos().isEmpty() && result.getVjezds().isEmpty()
+						&& result.getVyjezds().isEmpty()) {
 					zoneObjectsMap.put(result.getIdZony(), result);
 					zoneShapesMap.put(result.getIdZony(), result.getGeoZony().getJGeometry().createShape());
 					System.out.print("Zona result: " + result.getIdZony().toString() + ", geo: "
 							+ result.getGeoZony().getJGeometry().toStringFull() + "\n");
 				}
-				/*objectsMap.put(result.getZona().getIdZony(), result);
-				shapesMap.put(result.getZona().getIdZony(), result.getJGeometry().createShape());
-				System.out.print("ParkovaciMisto result: " + result.getIdMista().toString() + ", geo: "
-						+ result.getJGeometry().toStringFull() + "\n");*/
+				/*
+				 * objectsMap.put(result.getZona().getIdZony(), result);
+				 * shapesMap.put(result.getZona().getIdZony(),
+				 * result.getJGeometry().createShape());
+				 * System.out.print("ParkovaciMisto result: " + result.getIdMista().toString() +
+				 * ", geo: " + result.getJGeometry().toStringFull() + "\n");
+				 */
 			}
 
 			List<ParkovaciMisto> parkPlaceresultList = ParkovaciMisto.list();
@@ -465,11 +515,13 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		// objectsMap.get(selectedShape).getZona(), p.getParkovanis());
 		// ParkovaciMisto.selectObjectByGeometry(selectedShape);
 		// selectedShape.update();
-		//Zona.update(selectedShape.getIdZony(), selectedShape.getNazevZony(), selectedShape.getJGeoZony());
+		// Zona.update(selectedShape.getIdZony(), selectedShape.getNazevZony(),
+		// selectedShape.getJGeoZony());
 		switch (selectedType) {
 		case parkPlace:
 			ParkovaciMisto parkPlace = objectsMap.get(selectedShape.getIdZony());
-			ParkovaciMisto.update(parkPlace.getIdMista(), parkPlace.getPozn(), parkPlace.getZona(),parkPlace.getParkovanis());
+			ParkovaciMisto.update(parkPlace.getIdMista(), parkPlace.getPozn(), parkPlace.getZona(),
+					parkPlace.getParkovanis());
 			break;
 
 		case entrance:
@@ -481,7 +533,7 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 			Vyjezd exit = exitObjectsMap.get(selectedShape.getIdZony());
 			Vyjezd.update(exit.getIdVyjezd(), exit.getZona());
 			break;
-			
+
 		case zone:
 			Zona zone = zoneObjectsMap.get(selectedShape.getIdZony());
 			Zona.update(zone.getIdZony(), zone.getNazevZony(), zone.getJGeoZony());
@@ -513,7 +565,7 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 	public Vyjezd getExitByID(Long id) {
 		return exitObjectsMap.get(id);
 	}
-	
+
 	public Zona getZoneByID(Long id) {
 		return zoneObjectsMap.get(id);
 	}
@@ -523,34 +575,39 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		case parkPlace:
 			objectsMap.remove(selectedShape.getIdZony());
 			shapesMap.remove(selectedShape.getIdZony());
-			ParkovaciMisto.delete(selectedShape.getIdZony());
+			ParkovaciMisto.delete(ParkovaciMisto.getByZona(selectedShape).getIdMista());
 			repaint();
 			break;
 
 		case entrance:
 			entranceObjectsMap.remove(selectedShape.getIdZony());
 			entranceShapesMap.remove(selectedShape.getIdZony());
-			Vjezd.delete(selectedShape.getIdZony());
+			// Vjezd.delete(selectedShape.getIdZony());
+			Vjezd.delete(Vjezd.getByZona(selectedShape).getIdVjezd());
 			repaint();
 			break;
 
 		case exit:
 			exitObjectsMap.remove(selectedShape.getIdZony());
 			exitShapesMap.remove(selectedShape.getIdZony());
-			Vyjezd.delete(selectedShape.getIdZony());
-			repaint();
+			// Vyjezd.delete(selectedShape.getIdZony());
+			Vyjezd.delete(Vyjezd.getByZona(selectedShape).getIdVyjezd());
 			break;
 
 		case zone:
 			zoneObjectsMap.remove(selectedShape.getIdZony());
 			zoneShapesMap.remove(selectedShape.getIdZony());
-			Zona.delete(selectedShape.getIdZony());
+			// Zona.delete(selectedShape.getIdZony());
 			repaint();
 			break;
-			
+
 		case nothing:
-			break;
+			return;
+			//break;
 		}
+		Zona.delete(selectedShape.getIdZony());
+		repaint();
+
 		selectedShape = null;
 		selectedType = SpatialType.nothing;
 		parentFormPanel.onObjectSelected();
