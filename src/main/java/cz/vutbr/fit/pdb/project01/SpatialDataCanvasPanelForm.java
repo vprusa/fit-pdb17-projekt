@@ -297,45 +297,45 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		while (it.hasNext()) {
 			Zona z = it.next();
 			if (Vyjezd.getByZona(z) != null) {
-				
+
 				if (Vyjezd.getByZona(idx) != null) {
-					
+
 				} else if (Vjezd.getByZona(idx) != null) {
-					
+
 				} else if (ParkovaciMisto.getByZona(idx) != null) {
 					idx = z;
 				} else {
 					// default zona
 					idx = z;
 				}
-			
+
 			} else if (Vjezd.getByZona(z) != null) {
 				if (Vyjezd.getByZona(idx) != null) {
-					
+
 				} else if (Vjezd.getByZona(idx) != null) {
-					
+
 				} else if (ParkovaciMisto.getByZona(idx) != null) {
 					idx = z;
-					
+
 				} else {
 					// default zona
 					idx = z;
 				}
-				
+
 			} else if (ParkovaciMisto.getByZona(z) != null) {
 				if (Vyjezd.getByZona(idx) != null) {
-					
+
 				} else if (Vjezd.getByZona(idx) != null) {
-					
+
 				} else if (ParkovaciMisto.getByZona(idx) != null) {
-					
+
 				} else {
 					// default zona
 					idx = z;
 				}
 			} else {
 				// default zona
-				
+
 			}
 		}
 
@@ -574,34 +574,39 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 		case parkPlace:
 			objectsMap.remove(selectedShape.getIdZony());
 			shapesMap.remove(selectedShape.getIdZony());
-			ParkovaciMisto.delete(selectedShape.getIdZony());
+			ParkovaciMisto.delete(ParkovaciMisto.getByZona(selectedShape).getIdMista());
 			repaint();
 			break;
 
 		case entrance:
 			entranceObjectsMap.remove(selectedShape.getIdZony());
 			entranceShapesMap.remove(selectedShape.getIdZony());
-			Vjezd.delete(selectedShape.getIdZony());
+			// Vjezd.delete(selectedShape.getIdZony());
+			Vjezd.delete(Vjezd.getByZona(selectedShape).getIdVjezd());
 			repaint();
 			break;
 
 		case exit:
 			exitObjectsMap.remove(selectedShape.getIdZony());
 			exitShapesMap.remove(selectedShape.getIdZony());
-			Vyjezd.delete(selectedShape.getIdZony());
-			repaint();
+			// Vyjezd.delete(selectedShape.getIdZony());
+			Vyjezd.delete(Vyjezd.getByZona(selectedShape).getIdVyjezd());
 			break;
 
 		case zone:
 			zoneObjectsMap.remove(selectedShape.getIdZony());
 			zoneShapesMap.remove(selectedShape.getIdZony());
-			Zona.delete(selectedShape.getIdZony());
+			// Zona.delete(selectedShape.getIdZony());
 			repaint();
 			break;
 
 		case nothing:
-			break;
+			return;
+			//break;
 		}
+		Zona.delete(selectedShape.getIdZony());
+		repaint();
+
 		selectedShape = null;
 		selectedType = SpatialType.nothing;
 		parentFormPanel.onObjectSelected();
