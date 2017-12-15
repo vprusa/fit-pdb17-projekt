@@ -522,12 +522,12 @@ public class MainForm extends JFrame {
 
 	protected void RefreshTemp() {
 			List<Pobyt> pobyty = Pobyt.getCurrentResidence();
-			List<String[]> arrayList = new ArrayList();#
+			List<String[]> arrayList = new ArrayList();
 			for (Pobyt pob : pobyty)
 			{
 				
 			}
-			currentResidence.setModel(new PobytModel(pobyty.ar));
+		//	currentResidence.setModel(new PobytModel(pobyty.ar));
 	}
 
 	private String[] originalListRefresh() {

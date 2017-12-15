@@ -45,7 +45,7 @@ public class ParkovaciMisto extends TableBase implements java.io.Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ZONA_ID", nullable = false)
 	private Zona zona;
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "parkovaciMisto")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "parkovaciMisto")
 	private Set<Parkovani> parkovanis = new HashSet<Parkovani>(0);
 
 	public ParkovaciMisto() {
