@@ -1,6 +1,7 @@
 package cz.vutbr.fit.pdb.project.tables;
 // Generated Nov 28, 2017 5:54:05 PM by Hibernate Tools 4.3.5.Final
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -261,12 +262,27 @@ public class Zona extends TableBase implements java.io.Serializable {
 		}
 		return Collections.emptyList();
 	}
-	
+
 	public static boolean overlapByGeometry(Zona zone) {
 		try {
-			List<Zona> resultList = selectObjectsByGeometry(zone.getJGeoZony());
-			for(Zona resultZone : resultList) {
-				if(resultZone.getIdZony() != zone.getIdZony()) {
+			List<Zona> resultList2 = selectObjectsByGeometry(zone.getJGeoZony());
+
+			List<Zona> resultList = new ArrayList<Zona>();
+			for (Zona z : resultList2) {
+				if (Vyjezd.getByZona(z) != null) {
+					resultList.add(z);
+				} else if (Vjezd.getByZona(z) != null) {
+					resultList.add(z);
+				} else if (ParkovaciMisto.getByZona(z) != null) {
+					resultList.add(z);
+				} else {
+
+				}
+
+			}
+
+			for (Zona resultZone : resultList) {
+				if (resultZone.getIdZony() != zone.getIdZony()) {
 					return true;
 				}
 			}
@@ -276,6 +292,7 @@ public class Zona extends TableBase implements java.io.Serializable {
 		}
 		return false;
 	}
-	//"select id from Zona where SDO_RELATE(geometry, ?, 'mask=ANYINTERACT') = 'TRUE'")
+	// "select id from Zona where SDO_RELATE(geometry, ?, 'mask=ANYINTERACT') =
+	// 'TRUE'")
 
 }

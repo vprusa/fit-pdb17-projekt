@@ -170,6 +170,7 @@ public class SpatialDataCanvasPanelForm extends JPanel implements MouseListener,
 
 						zoneAdding = false;
 						zoneAddingShape.clear();
+						return;
 					}
 				}
 			}

@@ -236,6 +236,8 @@ public class Vozidlo extends TableBase {
 		try {
 			entityManager.getTransaction().begin();
 			@SuppressWarnings("unchecked")
+			Session session = entityManager.unwrap(org.hibernate.Session.class);
+			//session.createSQLQuery("")
 			Vozidlo v = (Vozidlo) entityManager.createQuery("from Vozidlo where SPZ=:spz").setParameter("spz", spz)
 					.getSingleResult();
 			entityManager.getTransaction().commit();
